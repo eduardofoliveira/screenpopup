@@ -1,0 +1,22 @@
+<% include elements/header %>
+<% include elements/menu %>
+<div class="ui red segment list-users">
+  <p>Lista de usuários</p>
+  <table class="ui celled table">
+      <thead>
+        <tr><th>Nome</th>
+        <th>E-mail</th>
+        <th>Dominio</th>
+      </tr></thead>
+      <tbody>
+        <% usuarios.map(item => { %>
+        <tr>
+          <td data-label="Nome"><%= item.nome %></td>
+          <td data-label="E-mail"><%= item.email %></td>
+          <td data-label="Dominio"><%= item.dominio %></td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+</div>
+<% include elements/footer %>
