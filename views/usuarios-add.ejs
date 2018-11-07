@@ -1,0 +1,52 @@
+<% include elements/header %>
+<% include elements/menu %>
+<div class="ui red segment list-users">
+  <p>Adição de usuário</p>
+  <a href="/usuarios" class="ui red button">Voltar</a>
+  <div class="ui inverted segment">
+      <form class="ui inverted form" method="post">
+        <div class="two fields">
+          <div class="field">
+            <label>Nome</label>
+            <input placeholder="Nome" type="text" name="nome">
+          </div>
+          <div class="field">
+            <label>Usuário Basix</label>
+            <input placeholder="Usuário Basix" type="text" name="user_basix">
+          </div>
+        </div>
+
+        <div class="two fields">
+          <div class="field">
+            <label>Senha</label>
+            <input placeholder="Senha" type="text" name="senha">
+          </div>
+          <div class="field">
+            <label>Conf senha</label>
+            <input placeholder="Confirmação de senha" type="text" name="senha-conf">
+          </div>
+        </div>
+
+        <div class="two fields">
+          <div class="field">
+            <label>E-mail</label>
+            <input placeholder="E-mail" type="text" name="email">
+          </div>
+        </div>
+
+        <div class="four fields">
+          <div class="field">
+            <label>Dominio</label>
+            <select name="dominio">
+              <option value="">Selecione um dominio</option>
+              <option value="1">cloud.cloudcom.com.br</option>
+              <option value="2">brastel.brastel.com.br</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="ui inverted green button" type="submit">Adicionar</button>
+      </form>
+    </div>
+</div>
+<% include elements/footer %>

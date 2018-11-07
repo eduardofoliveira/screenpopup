@@ -2,21 +2,77 @@
 <% include elements/menu %>
 <div class="ui red segment list-users">
   <p>Lista de usuários</p>
-  <table class="ui celled table">
+  <a href="/usuarios/adicionar" class="ui green button">Adicionar</a>
+  <!-- <%= JSON.stringify(usuarios) %> -->
+  <table class="ui selectable inverted table">
       <thead>
-        <tr><th>Nome</th>
-        <th>E-mail</th>
-        <th>Dominio</th>
-      </tr></thead>
+        <tr>
+          <th>Ativo</th>
+          <th>Nome</th>
+          <th>E-mail</th>
+          <th>Usuário Basix</th>
+          <th>Dominio</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
       <tbody>
         <% usuarios.map(item => { %>
         <tr>
+          <td class="collapsing">
+            <div class="ui fitted slider checkbox">
+              <input type="checkbox" <%= (item.ativo === 1 ? 'checked' : '') %>> <label></label>
+            </div>
+          </td>
           <td data-label="Nome"><%= item.nome %></td>
           <td data-label="E-mail"><%= item.email %></td>
+          <td data-label="Nome"><%= item.user_basix %></td>
           <td data-label="Dominio"><%= item.dominio %></td>
+          <td>
+            <button class="ui inverted red button" onclick="execModal(1)">Remover</button>
+          </td>
         </tr>
         <% }) %>
       </tbody>
     </table>
 </div>
+
+<div class="ui special modal">
+  <div class="header">
+    Deletar conta
+  </div>
+  <div class="content">
+    <i class="window close icon" style="font-size: 2em; color:red; display: inline;"></i>
+    <div class="modal-content-text">Apagar a conta do usuário Eduardo</div>
+    <div class="ui hidden divider"></div>
+  </div>
+  <div class="actions">
+    <div class="ui negative button">
+      No
+    </div>
+    <div class="ui positive right labeled icon button">
+      Yes
+      <i class="checkmark icon"></i>
+    </div>
+  </div>
+</div>
+
+<script>
+function execModal(id){
+  //$('.ui.special.modal div.header').html('Deletar conta Eduardo')
+
+  $('.ui.special.modal')
+  .modal({
+    closable  : true,
+    onDeny    : function(){
+      //window.alert('Wait not yet!' + id);
+      $('.ui.special.modal').modal('hide')
+      return false;
+    },
+    onApprove : function() {
+      window.alert('Approved!' + id);
+    }
+  })
+  .modal('show')
+}
+</script>
 <% include elements/footer %>

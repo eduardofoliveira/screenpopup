@@ -1,0 +1,105 @@
+<% include elements/header %>
+<% include elements/menu %>
+<div class="ui red segment list-users">
+  <p>Lista de domínios</p>
+  <button class="ui green button" onclick="addModal()">Adicionar</button>
+  <% if(error){ %>
+    <div class="ui red message"><%= error %></div>
+  <% } %>
+  <table class="ui selectable inverted table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Domínio</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% dominios.map(item => { %>
+        <tr>
+          <td data-label="ID"><%= item.id %></td>
+          <td data-label="Domínio"><%= item.dominio %></td>
+          <td>
+            <button class="ui inverted red button" onclick="deletarModal(<%= item.id %>)">Remover</button>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+</div>
+
+<div class="ui special modal">
+  <div class="header">
+    Deletar domínio
+  </div>
+  <div class="content">
+    <h3>cloud.cloudcom.com.br</h3>
+    <p>Todos os usuário sobre este domínio serão deletados</p>
+    <div class="ui hidden divider"></div>
+  </div>
+  <div class="actions">
+    <div class="ui negative button">
+      No
+    </div>
+    <div class="ui positive right labeled icon button">
+      Yes
+      <i class="checkmark icon"></i>
+    </div>
+  </div>
+</div>
+
+<div class="ui add modal">
+  <div class="header">
+    Adição de domínio
+  </div>
+  <div class="content">
+      <form class="ui form" method="post">
+          <div class="field">
+            <label>Domínio</label>
+            <input type="text" name="dominio" placeholder="Digite o domínio">
+          </div>
+          <button class="ui green button" type="submit">Adicionar</button>
+        </form>
+    <div class="ui hidden divider"></div>
+  </div>
+  <div class="actions">
+    <div class="ui negative button">
+      Fechar
+    </div>
+  </div>
+</div>
+
+<script>
+function addModal(){
+  $('.ui.add.modal').modal('show')
+}
+
+function deletarModal(id){
+  //$('.ui.special.modal div.header').html('Deletar conta Eduardo')
+
+  $('.ui.special.modal')
+  .modal({
+    closable  : true,
+    onDeny    : function(){
+      //window.alert('Wait not yet!' + id);
+      $('.ui.special.modal').modal('hide')
+      return false;
+    },
+    onApprove : function() {
+      axios.delete('/dominios/'+id, {
+        withCredentials: true
+      })
+      .then(response => {
+        if(response.status === 202){
+          location.reload()
+        }
+        if(response.status === 204){
+          window.alert('Ocorreu um erro !')
+        }
+      })
+    }
+  })
+  .modal('show')
+}
+</script>
+<% include elements/footer %>

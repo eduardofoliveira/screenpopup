@@ -17,6 +17,7 @@ app.use(session({
 const home = require('./controller/home')
 const login = require('./controller/login')
 const usuarios = require('./controller/usuarios')
+const dominios = require('./controller/dominios')
 
 const init = async () => {
   const connection = await require('./service/mysql')
@@ -24,6 +25,7 @@ const init = async () => {
   app.use('/login', login(connection))
   app.use('/', home(connection))
   app.use('/usuarios', usuarios(connection))
+  app.use('/dominios', dominios(connection))
   
 
   app.listen(port, (error) => {
