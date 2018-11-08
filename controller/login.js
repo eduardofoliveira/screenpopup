@@ -16,14 +16,16 @@ const init = connection => {
 
     //Gerar com peso 12
     //senha = await bcrypt.hash(senha, 12)
+    //console.log(senha)
 
-    const [user] = await connection.query('SELECT id, nome, email, senha, fk_id_dominio FROM usuario where email = ?', [email])
+    const [user] = await connection.query('select usuario.id, nome, email, senha, dominio from usuario, dominio where usuario.fk_id_dominio = dominio.id and email = ?', [email])
 
     if(user.length < 1){
       res.render('login', { error: true })
     }
 
     if(await bcrypt.compare(senha, user[0].senha)){
+      delete user[0].senha
       req.session.user = user[0]
       res.redirect('/')
     }else{

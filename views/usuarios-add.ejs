@@ -3,34 +3,39 @@
 <div class="ui red segment list-users">
   <p>Adição de usuário</p>
   <a href="/usuarios" class="ui red button">Voltar</a>
+  <% if(errors){ %>
+    <% errors.map(erro => { %>
+      <div class="ui red message"><%= erro.msg %></div>
+    <% }) %>
+  <% } %>
   <div class="ui inverted segment">
       <form class="ui inverted form" method="post">
         <div class="two fields">
           <div class="field">
             <label>Nome</label>
-            <input placeholder="Nome" type="text" name="nome">
+            <input placeholder="Nome" type="text" name="nome" value="<%= usuario.nome %>">
           </div>
           <div class="field">
             <label>Usuário Basix</label>
-            <input placeholder="Usuário Basix" type="text" name="user_basix">
+            <input placeholder="Usuário Basix" type="text" name="user_basix" value="<%= usuario.user_basix %>">
           </div>
         </div>
 
         <div class="two fields">
           <div class="field">
             <label>Senha</label>
-            <input placeholder="Senha" type="text" name="senha">
+            <input placeholder="Senha" type="password" name="senha" value="<%= usuario.senha %>">
           </div>
           <div class="field">
             <label>Conf senha</label>
-            <input placeholder="Confirmação de senha" type="text" name="senha-conf">
+            <input placeholder="Confirmação de senha" type="password" name="senha_conf" value="<%= usuario.senha_conf %>">
           </div>
         </div>
 
         <div class="two fields">
           <div class="field">
             <label>E-mail</label>
-            <input placeholder="E-mail" type="text" name="email">
+            <input placeholder="E-mail" type="text" name="email" value="<%= usuario.email %>">
           </div>
         </div>
 
@@ -39,8 +44,9 @@
             <label>Dominio</label>
             <select name="dominio">
               <option value="">Selecione um dominio</option>
-              <option value="1">cloud.cloudcom.com.br</option>
-              <option value="2">brastel.brastel.com.br</option>
+              <% dominios.map(item => { %>
+                <option value="<%= item.id %>" <%- (usuario.dominio == item.id ? "selected" : "") %> ><%= item.dominio %></option>
+              <% }) %>
             </select>
           </div>
         </div>

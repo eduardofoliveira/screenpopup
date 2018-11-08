@@ -20,7 +20,7 @@
         <tr>
           <td class="collapsing">
             <div class="ui fitted slider checkbox">
-              <input type="checkbox" <%= (item.ativo === 1 ? 'checked' : '') %>> <label></label>
+              <input type="checkbox" data-id="<%= item.id %>" <%= (item.ativo === 1 ? 'checked' : '') %>> <label></label>
             </div>
           </td>
           <td data-label="Nome"><%= item.nome %></td>
@@ -28,7 +28,7 @@
           <td data-label="Nome"><%= item.user_basix %></td>
           <td data-label="Dominio"><%= item.dominio %></td>
           <td>
-            <button class="ui inverted red button" onclick="execModal(1)">Remover</button>
+            <button class="ui inverted red button" onclick="execModal([<%= item.id %>, <%= `'${item.nome}'` %>])">Remover</button>
           </td>
         </tr>
         <% }) %>
@@ -57,22 +57,60 @@
 </div>
 
 <script>
-function execModal(id){
-  //$('.ui.special.modal div.header').html('Deletar conta Eduardo')
+function execModal(dados){
+  $('.ui.special.modal div.header').html('Deletar conta ' + dados[1])
+  $('.ui.special.modal div.content div.modal-content-text').html('Apagar a conta do usuário ' + dados[1])
 
   $('.ui.special.modal')
   .modal({
     closable  : true,
     onDeny    : function(){
-      //window.alert('Wait not yet!' + id);
       $('.ui.special.modal').modal('hide')
       return false;
     },
     onApprove : function() {
-      window.alert('Approved!' + id);
+      axios.delete('/usuarios/'+dados[0], {
+        withCredentials: true
+      })
+      .then(response => {
+        if(response.status === 202){
+          location.reload()
+        }
+        if(response.status === 204){
+          window.alert('Ocorreu um erro !')
+        }
+      })
     }
   })
   .modal('show')
 }
+
+$('div.checkbox input').click(function(){
+  if($(this).is(':checked')){
+    axios.put('/usuarios/ativar/'+$(this).attr("data-id"), {
+      withCredentials: true
+    })
+    .then(response => {
+      //if(response.status === 202){
+      //  location.reload()
+      //}
+      if(response.status === 204){
+        window.alert('Ocorreu um erro !')
+      }
+    })
+  }else{
+    axios.put('/usuarios/desativar/'+$(this).attr("data-id"), {
+      withCredentials: true
+    })
+    .then(response => {
+      //if(response.status === 202){
+      //  location.reload()
+      //}
+      if(response.status === 204){
+        window.alert('Ocorreu um erro !')
+      }
+    })
+  }
+})
 </script>
 <% include elements/footer %>

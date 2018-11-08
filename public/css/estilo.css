@@ -9,7 +9,7 @@ body > div.ui.fixed.inverted.menu > div > a.item.logoff{
   color: #DB2828 !important;
   font-weight: bold;
 }
-body > div.ui.red.segment.list-users{
+body > div.ui.red.segment.list-users, body > div.ui.green.segment.list-users{
   margin-left: 1%;
   margin-right: 1%;
 }

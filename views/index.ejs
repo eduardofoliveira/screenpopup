@@ -1,4 +1,88 @@
 <% include elements/header %>
 <% include elements/menu %>
+<div class="ui green segment list-users">
+    <p>Chamados</p>
+
+    <div class="ui top attached tabular menu">
+
+    </div>
+
+
+    </div>
+    <div class="ui bottom attached tab segment" data-tab="second">
+      Segunda chamada recebida
+    </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  $('.menu .item').tab();
+
+  const socket = io()
+  socket.on('<%= user.dominio %>', info => {
+    let id = new Date().getTime().toString().slice(9,13)
+
+    $('body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu')
+      .append(`<a class='item' data-tab='${id}'>${id}</a>`)
+
+    $('body > div.ui.green.segment.list-users').append(`
+      <div class="ui bottom attached tab segment" data-tab="${id}">
+        
+          <div class="ui form">
+          <div class="two fields">
+            <div class="field">
+              <label>Originador</label>
+              <div class="ui black message">${info.from}</div>
+            </div>
+
+            <div class="field">
+              <label>Descrição</label>
+              <div class="ui blue message">${info.fromComment}</div>
+            </div>
+          </div>
+          
+          <div class="two fields">
+            <div class="field">
+              <label>Destino</label>
+              <div class="ui black message">${info.to}</div>
+            </div>
+
+            <div class="field">
+              <label>Descrição</label>
+              <div class="ui blue message">${info.toComment}</div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Script</label>
+            <textarea>${info.script}</textarea>
+          </div>
+          <div class="field">
+            <label>Comentarios da chamada</label>
+            <textarea rows="2"></textarea>
+          </div>
+
+          <button class="ui primary button">
+            Save
+          </button>
+          <button class="ui button" onclick="descartar(this)">
+            Discard
+          </button>
+        </div>
+
+      </div>
+    `)
+
+    $('.menu .item').tab()
+    $('body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu > a').click()
+  })
+
+  function descartar(event){
+    $(event).parent().parent().remove()
+    $('body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu').find('.active').remove()
+    $('body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu > a:first-child').click()
+  }
+
+</script>
 
 <% include elements/footer %>
