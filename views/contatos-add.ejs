@@ -1,0 +1,33 @@
+<% include elements/header %>
+<% include elements/menu %>
+<div class="ui purple segment list-users">
+  <p>Adição de contato</p>
+  <a href="/contatos" class="ui red button">Voltar</a>
+  <% if(errors){ %>
+    <% errors.map(erro => { %>
+      <div class="ui red message"><%= erro.msg %></div>
+    <% }) %>
+  <% } %>
+  <div class="ui inverted segment">
+      <form class="ui inverted form" method="post">
+        <div class="two fields">
+          <div class="field">
+            <label>DID</label>
+            <input placeholder="Numero" type="text" name="did" value="<%= contato.did %>">
+          </div>
+          <div class="field">
+            <label>Descrição</label>
+            <input placeholder="descrição" type="text" name="descricao" value="<%= contato.descricao %>">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Script</label>
+          <textarea placeholder="Script de atendimento" name="fraseologia"><%= contato.fraseologia %></textarea>
+        </div>
+
+        <button class="ui inverted green button" type="submit">Adicionar</button>
+      </form>
+    </div>
+</div>
+<% include elements/footer %>

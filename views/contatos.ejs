@@ -1,0 +1,80 @@
+<% include elements/header %>
+<% include elements/menu %>
+<div class="ui purple segment list-users">
+  <p>Agenda de contatos</p>
+  <a href="/contatos/adicionar" class="ui green button">Adicionar</a>
+
+  <table class="ui selectable inverted table">
+    <thead>
+      <tr>
+        <th>Numero</th>
+        <th>Descrição</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% contatos.map(contato => { %>
+        <tr>
+          <td data-label="ID"><%= contato.did %></td>
+          <td data-label="Domínio"><%= contato.descricao %></td>
+          <td>
+            <a href="/contatos/editar/<%= contato.id %>" class="ui inverted yellow button" onclick="deletarModal()">Editar</a>
+            <button class="ui inverted red button" onclick="deletarModal(<%= `${contato.id}, ${contato.did}` %>)">Remover</button>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<div class="ui special modal">
+  <div class="header">
+    Deletar contato
+  </div>
+  <div class="content">
+    <i class="window close icon" style="font-size: 2em; color:red; display: inline;"></i>
+    <div class="modal-content-text">Apagar contato</div>
+    <div class="ui hidden divider"></div>
+  </div>
+  <div class="actions">
+    <div class="ui negative button">
+      No
+    </div>
+    <div class="ui positive right labeled icon button">
+      Yes
+      <i class="checkmark icon"></i>
+    </div>
+  </div>
+</div>
+
+<script>
+function deletarModal(id, numero){
+  $('.ui.special.modal div.header').html('Deletar contato do numero: ' + numero)
+  $('.ui.special.modal div.content div.modal-content-text').html('Apagar contato do numero: ' + numero)
+
+  $('.ui.special.modal')
+  .modal({
+    closable  : true,
+    onDeny    : function(){
+      $('.ui.special.modal').modal('hide')
+      return false;
+    },
+    onApprove : function() {
+      axios.delete('/contatos/'+id, {
+        withCredentials: true
+      })
+      .then(response => {
+        console.log(response.status)
+        if(response.status === 202){
+          location.reload()
+        }
+        if(response.status === 204){
+          window.alert('Ocorreu um erro !')
+        }
+      })
+    }
+  })
+  .modal('show')
+}
+</script>
+<% include elements/footer %>

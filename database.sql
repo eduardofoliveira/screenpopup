@@ -5,6 +5,7 @@ create table dominio(
 
 create table usuario(
   id bigint not null primary key auto_increment,
+  ativo tinyint(1) not null default 1,
   nome varchar(100) not null,
   email varchar(100) not null,
   senha varchar(100) not null,
@@ -17,7 +18,9 @@ create table agenda(
   id bigint not null primary key auto_increment,
   did varchar(15) not null,
   descricao varchar(100) not null,
-  fraseologia varchar(2048)
+  fraseologia varchar(2048),
+  fk_id_dominio bigint,
+  foreign key (fk_id_dominio) references dominio (id)
 );
 
 insert into dominio (dominio) values ('cloud.cloudcom.com.br');

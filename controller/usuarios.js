@@ -6,12 +6,12 @@ const init = connection => {
   app.use(require('../middleware/authMiddleware'))
 
   app.get('/', async (req, res) => {
-    const [usuarios] = await connection.query('SELECT usuario.id, ativo, nome, email, user_basix, dominio FROM usuario, dominio WHERE usuario.fk_id_dominio = dominio.id')
+    const [usuarios] = await connection.query('SELECT usuario.id, ativo, nome, email, user_basix, dominio FROM usuario, dominio WHERE usuario.fk_id_dominio = dominio.id and dominio.id = ?', [req.session.user.fk_id_dominio])
     res.render('usuarios', {usuarios})
   })
 
   app.get('/adicionar', async (req, res) => {
-    const [dominios] = await connection.query('SELECT * FROM dominio')
+    const [dominios] = await connection.query('SELECT * FROM dominio where id = ?', [req.session.user.fk_id_dominio])
     let errors = null
     let usuario = {nome: '', email: '', senha: '', senha_conf: '', dominio: '', user_basix: ''}
     res.render('usuarios-add', {dominios, errors, usuario})
@@ -28,7 +28,7 @@ const init = connection => {
 
     let errors = req.validationErrors()
     if(errors){
-      const [dominios] = await connection.query('SELECT * FROM dominio')
+      const [dominios] = await connection.query('SELECT * FROM dominio where id = ?', [req.session.user.fk_id_dominio])
       res.render('usuarios-add', { dominios, errors, usuario })
       return
     }
