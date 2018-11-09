@@ -21,3 +21,6 @@ body > div.ui.red.segment.list-users, body > div.ui.purple.segment.list-users{
   display: inline-block;
   font-size: 2em;
 }
+body > div.ui.red.segment.list-users > div > form > div.ui.segment > div > div > label{
+  color: black
+}

@@ -19,7 +19,7 @@
         <% usuarios.map(item => { %>
         <tr>
           <td class="collapsing">
-            <div class="ui fitted slider checkbox">
+            <div class="ui toggle checkbox">
               <input type="checkbox" data-id="<%= item.id %>" <%= (item.ativo === 1 ? 'checked' : '') %>> <label></label>
             </div>
           </td>
@@ -28,6 +28,7 @@
           <td data-label="Nome"><%= item.user_basix %></td>
           <td data-label="Dominio"><%= item.dominio %></td>
           <td>
+            <a href="/usuarios/editar/<%= item.id %>" class="ui inverted yellow button">Editar</a>
             <button class="ui inverted red button" onclick="execModal([<%= item.id %>, <%= `'${item.nome}'` %>])">Remover</button>
           </td>
         </tr>

@@ -37,6 +37,8 @@ const init = connection => {
 
     let [existe] = await connection.query('SELECT * FROM dominio WHERE id = ?', [id])
     if(existe.length === 1){
+      await connection.query('DELETE FROM agenda WHERE fk_id_dominio = ?', [id])
+      await connection.query('DELETE FROM usuario WHERE fk_id_dominio = ?', [id])
       await connection.query('DELETE FROM dominio WHERE id = ?', [id])
       res.statusCode = 202
       res.charset = 'utf-8'

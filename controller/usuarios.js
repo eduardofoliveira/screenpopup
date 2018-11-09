@@ -90,6 +90,56 @@ const init = connection => {
 
   })
 
+  app.get('/editar/:id', async (req, res) => {
+    const { id } = req.params
+
+    let [usuario] = await connection.query('SELECT ativo, nome, user_basix, email, fk_id_dominio FROM usuario WHERE id = ?', [id])
+    if(usuario.length === 1){
+      const [dominios] = await connection.query('SELECT * FROM dominio where id = ?', [req.session.user.fk_id_dominio])
+      usuario = usuario[0]
+      let errors = null
+      res.render('usuarios-edt', {usuario, dominios, errors})
+    }else{
+
+    }
+  })
+
+  app.post('/editar/:id', async (req, res) => {
+    const { id } = req.params
+    const usuario = req.body
+
+    if(usuario.ativo){
+      usuario.ativo = 1
+    }else{
+      usuario.ativo = 0
+    }
+
+    req.assert('nome', 'Campo nome é obrigatório').notEmpty()
+    req.assert('email', 'Endereço de e-mail inválido.').isEmail()
+    req.assert('dominio', 'Selecione um domínio válido').notEmpty()
+
+    if(usuario.senha.length > 0){
+      req.assert('senha', 'A senha deve ter no minimo 8 caracteres').isLength({ min: 8 })
+      req.checkBody('senha_conf', 'Confirmação de senha inválida.').equals(usuario.senha)
+    }
+
+    let errors = req.validationErrors()
+    if(errors){
+      const [dominios] = await connection.query('SELECT * FROM dominio where id = ?', [req.session.user.fk_id_dominio])
+      res.render('usuarios-edt', { usuario, dominios, errors })
+      return
+    }
+
+    if(usuario.senha.length > 0){
+      usuario.senha = await bcrypt.hash(usuario.senha, 12)
+      await connection.query('UPDATE usuario set ativo = ?, nome = ?, email = ?, senha = ?, user_basix = ? WHERE id = ? AND fk_id_dominio = ?', [usuario.ativo, usuario.nome, usuario.email, usuario.senha, usuario.user_basix, id, req.session.user.fk_id_dominio])
+    }else{
+      await connection.query('UPDATE usuario set ativo = ?, nome = ?, email = ?, user_basix = ? WHERE id = ? AND fk_id_dominio = ?', [usuario.ativo, usuario.nome, usuario.email, usuario.user_basix, id, req.session.user.fk_id_dominio])
+    }
+
+    res.redirect('/usuarios')
+  })
+
   return app
 }
 
