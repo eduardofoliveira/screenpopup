@@ -5,7 +5,12 @@ const init = connection => {
   app.use(require('../middleware/authMiddleware'))
 
   app.get('/', async (req, res) => {
-    const [dominios] = await connection.query('SELECT * FROM dominio where id = ?', [req.session.user.fk_id_dominio])
+    if(req.session.user.tipo === 3){
+      [dominios] = await connection.query('SELECT * FROM dominio')
+    }else{
+      [dominios] = await connection.query('SELECT * FROM dominio where id = ?', [req.session.user.fk_id_dominio])
+    }
+    
     let error = null
     res.render('dominios', {dominios, error})
   })
@@ -14,7 +19,12 @@ const init = connection => {
     const { dominio } = req.body
 
     if(!dominio){
-      const [dominios] = await connection.query('SELECT * FROM dominio where id = ?', [req.session.user.fk_id_dominio])
+      if(req.session.user.tipo === 3){
+        [dominios] = await connection.query('SELECT * FROM dominio')
+      }else{
+        [dominios] = await connection.query('SELECT * FROM dominio where id = ?', [req.session.user.fk_id_dominio])
+      }
+
       let error = 'Campo domínio deve ser preenchido'
       res.render('dominios', {dominios, error})
       return
@@ -26,7 +36,12 @@ const init = connection => {
       await connection.query('INSERT INTO dominio (dominio) values (?)', [dominio])
       res.redirect('/dominios')
     }else{
-      const [dominios] = await connection.query('SELECT * FROM dominio where id = ?', [req.session.user.fk_id_dominio])
+      if(req.session.user.tipo === 3){
+        [dominios] = await connection.query('SELECT * FROM dominio')
+      }else{
+        [dominios] = await connection.query('SELECT * FROM dominio where id = ?', [req.session.user.fk_id_dominio])
+      }
+      
       let error = 'Domínio já existe'
       res.render('dominios', {dominios, error})
     }

@@ -6,12 +6,24 @@ const init = connection => {
   app.use(require('../middleware/authMiddleware'))
 
   app.get('/', async (req, res) => {
-    const [usuarios] = await connection.query('SELECT usuario.id, ativo, nome, email, user_basix, dominio FROM usuario, dominio WHERE usuario.fk_id_dominio = dominio.id and dominio.id = ?', [req.session.user.fk_id_dominio])
+
+    let usuarios
+
+    if(req.session.user.tipo === 3){
+      [usuarios] = await connection.query('SELECT usuario.id, ativo, nome, email, user_basix, dominio, tipo FROM usuario left join dominio on usuario.fk_id_dominio = dominio.id')
+    }else{
+      [usuarios] = await connection.query('SELECT usuario.id, ativo, nome, email, user_basix, dominio FROM usuario, dominio WHERE usuario.fk_id_dominio = dominio.id and dominio.id = ?', [req.session.user.fk_id_dominio])
+    }
+
     res.render('usuarios', {usuarios})
   })
 
   app.get('/adicionar', async (req, res) => {
-    const [dominios] = await connection.query('SELECT * FROM dominio where id = ?', [req.session.user.fk_id_dominio])
+    if(req.session.user.tipo === 3){
+      [dominios] = await connection.query('SELECT * FROM dominio')
+    }else{
+      [dominios] = await connection.query('SELECT * FROM dominio where id = ?', [req.session.user.fk_id_dominio])
+    }
     let errors = null
     let usuario = {nome: '', email: '', senha: '', senha_conf: '', dominio: '', user_basix: ''}
     res.render('usuarios-add', {dominios, errors, usuario})
@@ -95,7 +107,12 @@ const init = connection => {
 
     let [usuario] = await connection.query('SELECT ativo, nome, user_basix, email, fk_id_dominio FROM usuario WHERE id = ?', [id])
     if(usuario.length === 1){
-      const [dominios] = await connection.query('SELECT * FROM dominio where id = ?', [req.session.user.fk_id_dominio])
+      let dominios
+      if(req.session.user.tipo === 3){
+        [dominios] = await connection.query('SELECT * FROM dominio')
+      }else{
+        [dominios] = await connection.query('SELECT * FROM dominio where id = ?', [req.session.user.fk_id_dominio])
+      }
       usuario = usuario[0]
       let errors = null
       res.render('usuarios-edt', {usuario, dominios, errors})
@@ -130,11 +147,20 @@ const init = connection => {
       return
     }
 
-    if(usuario.senha.length > 0){
-      usuario.senha = await bcrypt.hash(usuario.senha, 12)
-      await connection.query('UPDATE usuario set ativo = ?, nome = ?, email = ?, senha = ?, user_basix = ? WHERE id = ? AND fk_id_dominio = ?', [usuario.ativo, usuario.nome, usuario.email, usuario.senha, usuario.user_basix, id, req.session.user.fk_id_dominio])
+    if(req.session.user.tipo === 3){
+      if(usuario.senha.length > 0){
+        usuario.senha = await bcrypt.hash(usuario.senha, 12)
+        await connection.query('UPDATE usuario set ativo = ?, nome = ?, email = ?, senha = ?, user_basix = ? WHERE id = ?', [usuario.ativo, usuario.nome, usuario.email, usuario.senha, usuario.user_basix, id])
+      }else{
+        await connection.query('UPDATE usuario set ativo = ?, nome = ?, email = ?, user_basix = ? WHERE id = ?', [usuario.ativo, usuario.nome, usuario.email, usuario.user_basix, id])
+      }
     }else{
-      await connection.query('UPDATE usuario set ativo = ?, nome = ?, email = ?, user_basix = ? WHERE id = ? AND fk_id_dominio = ?', [usuario.ativo, usuario.nome, usuario.email, usuario.user_basix, id, req.session.user.fk_id_dominio])
+      if(usuario.senha.length > 0){
+        usuario.senha = await bcrypt.hash(usuario.senha, 12)
+        await connection.query('UPDATE usuario set ativo = ?, nome = ?, email = ?, senha = ?, user_basix = ? WHERE id = ? AND fk_id_dominio = ?', [usuario.ativo, usuario.nome, usuario.email, usuario.senha, usuario.user_basix, id, req.session.user.fk_id_dominio])
+      }else{
+        await connection.query('UPDATE usuario set ativo = ?, nome = ?, email = ?, user_basix = ? WHERE id = ? AND fk_id_dominio = ?', [usuario.ativo, usuario.nome, usuario.email, usuario.user_basix, id, req.session.user.fk_id_dominio])
+      }
     }
 
     res.redirect('/usuarios')

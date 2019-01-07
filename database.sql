@@ -11,6 +11,7 @@ create table usuario(
   senha varchar(100) not null,
   user_basix varchar(30) not null,
   fk_id_dominio bigint,
+  tipo tinyint not null default 1,
   foreign key (fk_id_dominio) references dominio (id)
 );
 
@@ -25,3 +26,4 @@ create table agenda(
 
 insert into dominio (dominio) values ('cloud.cloudcom.com.br');
 insert into usuario (nome, email, senha, user_basix, fk_id_dominio) values ('Eduardo', 'eoliveira@cloudcom.com.br', '$2b$12$X1WEjDWBb9YJoH93tE4MbuFIVwRCGwiHoCOi7VSVv.fpPT.5SEIsW', 'Eduardo', 1);
+insert into usuario (nome, email, senha, user_basix, tipo) values ('admin', 'admin', '$2y$12$IPw75lsU5/sHHpghKNIDT.TFuIWXZnpeahXlVLRNrjIxTTIf7qSw6', 'admin', 3);

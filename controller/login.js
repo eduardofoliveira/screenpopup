@@ -18,7 +18,8 @@ const init = connection => {
     //senha = await bcrypt.hash(senha, 12)
     //console.log(senha)
 
-    const [user] = await connection.query('select usuario.id, nome, email, senha, dominio, fk_id_dominio from usuario, dominio where usuario.fk_id_dominio = dominio.id and email = ? and ativo = 1', [email])
+    //const [user] = await connection.query('select usuario.id, nome, email, senha, dominio, fk_id_dominio from usuario, dominio where usuario.fk_id_dominio = dominio.id and email = ? and ativo = 1', [email])
+    const [user] = await connection.query('select usuario.*, dominio from usuario left join dominio on usuario.fk_id_dominio = dominio.id where email = ? and ativo = 1', [email])
 
     if(user.length < 1){
       res.render('login', { error: true })
