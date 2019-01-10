@@ -4,8 +4,58 @@
     <p>Chamados</p>
 
     <div class="ui top attached tabular menu">
-
+      <% chamados.map((chamado, index) => { %>
+        <%- `<a class='item ${chamado.id === 1 ? "active" : ""}' data-tab='${chamado.id}'>${chamado.id}</a>` %>
+      <% }) %>
     </div>
+
+    <% chamados.map(chamado => { %>
+      <%- `<div class='ui bottom attached tab segment ${chamado.id === 1 ? "active" : ""}' data-tab='${chamado.id}'>
+        
+        <div class="ui form">
+          <div class="two fields">
+            <div class="field">
+              <label>Originador</label>
+              <div class="ui black message">${chamado.de}</div>
+            </div>
+  
+            <div class="field">
+              <label>Descrição</label>
+              <div class="ui ${chamado.de_descricao ? 'blue' : 'red'} message">${chamado.de_descricao ? chamado.de_descricao : "Não encontrado"}</div>
+            </div>
+          </div>
+          
+          <div class="two fields">
+            <div class="field">
+              <label>Destino</label>
+              <div class="ui black message">${chamado.para}</div>
+            </div>
+  
+            <div class="field">
+              <label>Descrição</label>
+              <div class="ui ${chamado.para_descricao ? 'blue' : 'red'} message">${chamado.para_descricao ? chamado.para_descricao : "Não encontrado"}</div>
+            </div>
+          </div>
+  
+          <div class="field">
+            <label>Script</label>
+            <textarea>${chamado.para_script}</textarea>
+          </div>
+          <div class="field">
+            <label>Comentarios da chamada</label>
+            <textarea rows="2"></textarea>
+          </div>
+  
+          <button class="ui primary button">
+            Save
+          </button>
+          <button class="ui button" onclick="descartar(this)">
+            Discard
+          </button>
+        </div>
+  
+      </div>` %>
+    <% }) %>
 
     <!--<div class="ui bottom attached tab segment" data-tab="second">
       Segunda chamada recebida

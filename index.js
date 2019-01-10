@@ -24,34 +24,13 @@ const login = require('./controller/login')
 const usuarios = require('./controller/usuarios')
 const dominios = require('./controller/dominios')
 const contatos = require('./controller/contatos')
+const chamada = require('./controller/chamada')
 
 const init = async () => {
   const connection = await require('./service/mysql')
 
-  app.get('/chamada/:from/:to/:user/:domain', async (req, res) => {
-    const parametros = req.params
-
-    let [fromComment] = await connection.query('SELECT descricao FROM agenda, dominio WHERE agenda.fk_id_dominio = dominio.id and did = ? and dominio.dominio = ?', [parametros.from, parametros.domain])
-    if(fromComment.length === 1){
-      parametros.fromComment = fromComment[0].descricao
-    }else{
-      parametros.fromComment = ''
-    }
-    
-    let [to] = await connection.query('SELECT descricao, fraseologia FROM agenda, dominio WHERE agenda.fk_id_dominio = dominio.id and did = ? and dominio.dominio = ?', [parametros.to, parametros.domain])
-    if(to.length === 1){
-      parametros.toComment = to[0].descricao
-      parametros.script = to[0].fraseologia
-    }else{
-      parametros.toComment = ''
-      parametros.script = ''
-    }
-
-    io.emit(`${parametros.domain}-${parametros.user}`, parametros)
-    res.send()
-  })
-
   app.use('/login', login(connection))
+  app.use('/chamada', chamada(connection, io))
   app.use('/', home(connection))
   app.use('/usuarios', usuarios(connection))
   app.use('/dominios', dominios(connection))
