@@ -21,11 +21,12 @@ const init  = (connection, io) => {
       parametros.script = ''
     }
 
+    let [[retorno]] = await connection.query('SELECT usuario.id AS id_usuario, dominio.id AS id_dominio FROM dominio, usuario WHERE usuario.fk_id_dominio = dominio.id AND dominio.dominio = ? AND usuario.user_basix = ?', [parametros.domain, parametros.user])
+    let [chamado] = await connection.query('INSERT INTO chamado (de, para, fk_id_usuario, fk_id_dominio) VALUES (?, ?, ?, ?)', [parametros.from, parametros.to, retorno.id_usuario, retorno.id_dominio])
+    parametros.id = chamado.insertId
+
     io.emit(`${parametros.domain}-${parametros.user}`, parametros)
     res.send()
-
-    let [[retorno]] = await connection.query('SELECT usuario.id AS id_usuario, dominio.id AS id_dominio FROM dominio, usuario WHERE usuario.fk_id_dominio = dominio.id AND dominio.dominio = ? AND usuario.user_basix = ?', [parametros.domain, parametros.user])
-    connection.query('INSERT INTO chamado (de, para, fk_id_usuario, fk_id_dominio) VALUES (?, ?, ?, ?)', [parametros.from, parametros.to, retorno.id_usuario, retorno.id_dominio])
   })
 
   return app

@@ -5,12 +5,12 @@
 
     <div class="ui top attached tabular menu">
       <% chamados.map((chamado, index) => { %>
-        <%- `<a class='item ${chamado.id === 1 ? "active" : ""}' data-tab='${chamado.id}'>${chamado.id}</a>` %>
+        <%- `<a class='item ${index === chamados.length - 1 ? "active" : ""}' data-tab='${chamado.id}'>${chamado.id}</a>` %>
       <% }) %>
     </div>
 
-    <% chamados.map(chamado => { %>
-      <%- `<div class='ui bottom attached tab segment ${chamado.id === 1 ? "active" : ""}' data-tab='${chamado.id}'>
+    <% chamados.map((chamado, index) => { %>
+      <%- `<div class='ui bottom attached tab segment ${index === chamados.length - 1 ? "active" : ""}' data-tab='${chamado.id}'>
         
         <div class="ui form">
           <div class="two fields">
@@ -39,18 +39,18 @@
   
           <div class="field">
             <label>Script</label>
-            <textarea>${chamado.para_script}</textarea>
+            <textarea readonly>${chamado.para_script ? chamado.para_script : ''}</textarea>
           </div>
           <div class="field">
             <label>Comentarios da chamada</label>
-            <textarea rows="2"></textarea>
+            <textarea rows="2" id="comentario-${chamado.id}">${chamado.comentario ? chamado.comentario : ''}</textarea>
           </div>
   
-          <button class="ui primary button">
-            Save
+          <button class="ui primary button" onclick="salvar(this, ${chamado.id})">
+            Salvar
           </button>
-          <button class="ui button" onclick="descartar(this)">
-            Discard
+          <button class="ui red button" onclick="deletarChamado(${chamado.id}, ${chamado.de}, ${chamado.para}, this)">
+            Descartar
           </button>
         </div>
   
@@ -62,19 +62,39 @@
     </div>-->
 </div>
 
+<div class="ui tiny modal">
+  <div class="header">
+    Title
+  </div>
+  <div class="content">
+    
+    <div class="modal-content-text">Context text</div>
+    <div class="ui hidden divider"></div>
+  </div>
+  <div class="actions">
+    <div class="ui negative button">
+      Não
+    </div>
+    <div class="ui positive right labeled icon button">
+      Sim
+      <i class="checkmark icon"></i>
+    </div>
+  </div>
+</div>
+
 <script src="/socket.io/socket.io.js"></script>
 <script>
   $('.menu .item').tab();
 
   const socket = io()
   socket.on('<%= user.dominio %>-<%= user.nome %>', info => {
-    let id = new Date().getTime().toString().slice(9,13)
+    //let id = new Date().getTime().toString().slice(9,13)
 
     $('body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu')
-      .append(`<a class='item' data-tab='${id}'>${id}</a>`)
+      .append(`<a class='item' data-tab='${info.id}'>${info.id}</a>`)
 
     $('body > div.ui.green.segment.list-users').append(`
-      <div class="ui bottom attached tab segment" data-tab="${id}">
+      <div class="ui bottom attached tab segment" data-tab="${info.id}">
         
           <div class="ui form">
           <div class="two fields">
@@ -103,18 +123,18 @@
 
           <div class="field">
             <label>Script</label>
-            <textarea>${info.script}</textarea>
+            <textarea readonly>${info.script}</textarea>
           </div>
           <div class="field">
             <label>Comentarios da chamada</label>
-            <textarea rows="2"></textarea>
+            <textarea rows="2" id="comentario-${info.id}"></textarea>
           </div>
 
-          <button class="ui primary button">
-            Save
+          <button class="ui primary button" onclick="salvar(this, ${info.id})">
+            Salvar
           </button>
-          <button class="ui button" onclick="descartar(this)">
-            Discard
+          <button class="ui red button" onclick="deletarChamado(${info.id}, ${info.from}, ${info.to}, this)">
+            Descartar
           </button>
         </div>
 
@@ -129,6 +149,54 @@
     $(event).parent().parent().remove()
     $('body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu').find('.active').remove()
     $('body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu > a:first-child').click()
+  }
+
+  function deletarChamado(id, from, to, event){
+    $('.ui.tiny.modal div.header').html('Remoção de chamado')
+    $('.ui.tiny.modal div.content div.modal-content-text').html(`<div class="ui red message">id: ${id}<br>de: ${from}<br>para: ${to}</div>`)
+
+    $('.ui.tiny.modal')
+    .modal({
+      closable  : true,
+      onDeny    : function(){
+        $('.ui.tiny.modal').modal('hide')
+        return false;
+      },
+      onApprove : function() {
+        axios.delete('/chamados/'+id, {
+          withCredentials: true
+        })
+        .then(response => {
+          console.log(response.status)
+          if(response.status === 202){
+            //location.reload()
+            $(event).parent().parent().remove()
+            $('body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu').find('.active').remove()
+            $('body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu > a:first-child').click()
+          }
+          if(response.status === 204){
+            window.alert('Ocorreu um erro !')
+          }
+        })
+      }
+    })
+    .modal('show')
+  }
+
+  function salvar(event, id){
+    let $TextArea = document.getElementById(`comentario-${id}`)
+    console.log($TextArea.value, id)
+
+    axios.put(`/chamados/${id}`, { comentario: $TextArea.value } ,{ withCredentials: true })
+    .then(response => {
+      if(response.status === 200){
+        $(event).parent().parent().remove()
+        $('body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu').find('.active').remove()
+        $('body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu > a:first-child').click()
+      }else{
+        window.alert('Ocorreu um erro !')
+      }
+    })
   }
 
 </script>

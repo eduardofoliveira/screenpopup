@@ -10,6 +10,7 @@ const port = process.env.PORT || process.env.WEB_PORT
 
 app.set('view engine', 'ejs')
 app.use(bodyParser.urlencoded({extended: true}))
+app.use(bodyParser.json())
 app.use(express.static('public'))
 app.use(session({
   secret: 'B@lpha9001',
@@ -25,12 +26,14 @@ const usuarios = require('./controller/usuarios')
 const dominios = require('./controller/dominios')
 const contatos = require('./controller/contatos')
 const chamada = require('./controller/chamada')
+const chamados = require('./controller/chamados')
 
 const init = async () => {
   const connection = await require('./service/mysql')
 
   app.use('/login', login(connection))
   app.use('/chamada', chamada(connection, io))
+  app.use('/chamados', chamados(connection))
   app.use('/', home(connection))
   app.use('/usuarios', usuarios(connection))
   app.use('/dominios', dominios(connection))

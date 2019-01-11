@@ -37,12 +37,11 @@
     </table>
 </div>
 
-<div class="ui special modal">
+<div class="ui tiny modal">
   <div class="header">
     Deletar conta
   </div>
   <div class="content">
-    <i class="window close icon" style="font-size: 2em; color:red; display: inline;"></i>
     <div class="modal-content-text">Apagar a conta do usuário Eduardo</div>
     <div class="ui hidden divider"></div>
   </div>
@@ -59,14 +58,14 @@
 
 <script>
 function execModal(dados){
-  $('.ui.special.modal div.header').html('Deletar conta ' + dados[1])
-  $('.ui.special.modal div.content div.modal-content-text').html('Apagar a conta do usuário ' + dados[1])
+  $('.ui.tiny.modal div.header').html('Deletar usuário')
+  $('.ui.tiny.modal div.content div.modal-content-text').html(`<div class="ui red message">conta: ${dados[1]}</div>`)
 
-  $('.ui.special.modal')
+  $('.ui.tiny.modal')
   .modal({
     closable  : true,
     onDeny    : function(){
-      $('.ui.special.modal').modal('hide')
+      $('.ui.tiny.modal').modal('hide')
       return false;
     },
     onApprove : function() {

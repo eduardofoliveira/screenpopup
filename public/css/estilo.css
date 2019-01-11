@@ -18,9 +18,17 @@ body > div.ui.red.segment.list-users, body > div.ui.purple.segment.list-users{
   background: rgba(255, 255, 255, 0.8)
 }
 .modal-content-text{
-  display: inline-block;
-  font-size: 2em;
+  /*display: inline-block;
+  font-size: 1.1em;*/
 }
 body > div.ui.red.segment.list-users > div > form > div.ui.segment > div > div > label{
   color: black
+}
+
+div.ui.tiny.modal > div.header,
+div.ui.tiny.modal > div.actions,
+div.ui.special.modal > div.header,
+div.ui.special.modal > div.actions {
+  background-color: #1678c2;
+  color: white;
 }
