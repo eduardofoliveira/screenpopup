@@ -26,7 +26,7 @@ const init  = (connection, ) => {
 
     let [existe] = await connection.query('SELECT * FROM chamado WHERE id = ?', [id])
     if(existe.length === 1){
-      await connection.query('UPDATE chamado set aberto = 0, comentario = ? where id = ?', [chamado.comentario, id])
+      await connection.query('UPDATE chamado set aberto = 0, comentario = ?, fk_fechado_por = ? where id = ?', [chamado.comentario, req.session.user.id, id])
 
       res.statusCode = 200
       res.charset = 'utf-8'
@@ -36,8 +36,6 @@ const init  = (connection, ) => {
       res.charset = 'utf-8'
       res.json({message: 'erro ao atualizar chamado'})
     }
-
-    
   })
 
   return app
