@@ -7,6 +7,8 @@ const init  = (connection, io) => {
   app.post('/locus', (req, res) => {
     let parametros = req.body
 
+    console.log('Chegou info do ASTPP')
+
     if(parametros.call.evento !== 'CHANNEL_HANGUP_COMPLETE'){
       lista.push([parametros.call.callid, parametros.call])
     }
@@ -26,6 +28,7 @@ const init  = (connection, io) => {
     const parametros = req.params
 
     console.log(parametros.domain)
+    console.log(lista)
 
     if(parametros.domain === 'locus.brastel.com.br'){
       lista.find((item, index) => {
