@@ -25,7 +25,9 @@ const init  = (connection, io) => {
   app.get('/:from/:to/:user/:domain/:callid/:event', async (req, res) => {
     const parametros = req.params
 
-    if(parametros.parametros === 'locus.brastel.com.br'){
+    console.log(parametros.domain)
+
+    if(parametros.domain === 'locus.brastel.com.br'){
       lista.find((item, index) => {
         if(item[1].from === parametros.from){
           parametros.to = item[1].to
