@@ -18,6 +18,8 @@ const init  = (connection, io) => {
         (SELECT dominio.id FROM dominio, usuario WHERE usuario.fk_id_dominio = dominio.id AND dominio.dominio = ? AND usuario.user_basix = ?) AS id_dominio
       `, [parametros.from, parametros.domain, parametros.to, parametros.domain, parametros.to, parametros.domain, parametros.domain, parametros.user, parametros.domain, parametros.user])
 
+      console.log(descricoes)
+
       parametros.fromComment = descricoes.desc_from ? descricoes.desc_from : ''
       parametros.toComment = descricoes.desc_to ? descricoes.desc_to : ''
       parametros.script = descricoes.script ? descricoes.script : ''
