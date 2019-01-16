@@ -25,7 +25,7 @@ const init  = (connection, io) => {
       parametros.script = descricoes.script ? descricoes.script : ''
 
       if(Number.isInteger(descricoes.id_usuario) && Number.isInteger(descricoes.id_dominio)){
-        let [chamado] = await connection.query('INSERT INTO chamado (de, para, call_id, fk_id_usuario, fk_id_dominio) VALUES (?, ?, ?, ?)', [parametros.from, parametros.to, parametros.callid, descricoes.id_usuario, descricoes.id_dominio])
+        let [chamado] = await connection.query('INSERT INTO chamado (de, para, call_id, fk_id_usuario, fk_id_dominio) VALUES (?, ?, ?, ?, ?)', [parametros.from, parametros.to, parametros.callid, descricoes.id_usuario, descricoes.id_dominio])
         parametros.id = chamado.insertId
 
         io.emit(`${parametros.domain}-${parametros.user}`, parametros)
