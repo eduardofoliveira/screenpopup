@@ -7,14 +7,31 @@ const init  = (connection, io) => {
   app.post('/locus', (req, res) => {
     let parametros = req.body
 
-    console.log('Chamada Locus')
-    console.log(parametros)
+    if(parametros.call.evento !== 'CHANNEL_HANGUP_COMPLETE'){
+      lista.push([parametros.call.callid, parametros.call])
+    }
+
+    if(parametros.call.evento === 'CHANNEL_HANGUP_COMPLETE'){
+      lista.find((item, index) => {
+        if(item[1].callid === parametros.call.callid){
+            lista.splice(index)
+        }
+      })
+    }
 
     res.send()
   })
 
   app.get('/:from/:to/:user/:domain/:callid/:event', async (req, res) => {
     const parametros = req.params
+
+    if(parametros.parametros === 'locus.brastel.com.br'){
+      lista.find((item, index) => {
+        if(item[1].from === parametros.from){
+          parametros.to = item[1].to
+        }
+      })
+    }
 
     console.log(parametros)
 
