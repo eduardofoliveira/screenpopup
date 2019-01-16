@@ -5,7 +5,10 @@ const init  = (connection, io) => {
   app.get('/:from/:to/:user/:domain/:callid/:event', async (req, res) => {
     const parametros = req.params
 
+    console.log(parametros)
+
     if(parametros.event === 'RINGING'){
+      console.log('Entou RINGING')
       let [[descricoes]] = await connection.query(`
       select
         (select descricao from agenda, dominio where did = ? and agenda.fk_id_dominio = dominio.id and dominio.dominio = ?) as desc_from,
@@ -30,6 +33,7 @@ const init  = (connection, io) => {
       return
     }
     if(parametros.event === 'DISCONNECTED'){
+      console.log('Entou DISCONNECTED')
       res.send()
       connection.query('UPDATE chamado SET termino = now() WHERE call_id = ?', [parametros.callid])
       return
