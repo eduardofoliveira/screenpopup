@@ -26,7 +26,7 @@
           <td><%= chamado.de %></td>
           <td><%= chamado.para %></td>
           <td><%= chamado.nome_aberto_por %></td>
-          <td><%= chamado.inicio.getDate() + '/' + chamado.inicio.getMonth()+1 + '/' + chamado.inicio.getFullYear() + ' ' + chamado.inicio.toLocaleTimeString() %></td>
+          <td><%= `${chamado.inicio.getDate()}/${(chamado.inicio.getMonth()+1).toString().padStart(2, '0')}/${chamado.inicio.getFullYear()} ${chamado.inicio.getHours().toString().padStart(2, '0')}:${chamado.inicio.getMinutes().toString().padStart(2, '0')}:${chamado.inicio.getSeconds().toString().padStart(2, '0')}` %></td>
         </tr>
       <% }) %>
     </tbody>
