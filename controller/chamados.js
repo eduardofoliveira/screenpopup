@@ -63,9 +63,9 @@ const init  = (connection, ) => {
       ASC
     `, [id])
 
-    chamado.inicio = `${chamado.inicio.getDate()}/${(chamado.inicio.getMonth()+1).toString().padStart(2, '0')}/${chamado.inicio.getFullYear()} ${chamado.inicio.toLocaleTimeString()}`
+    chamado.inicio = `${chamado.inicio.getDate()}/${(chamado.inicio.getMonth()+1).toString().padStart(2, '0')}/${chamado.inicio.getFullYear()} ${chamado.inicio.toLocaleTimeString('pt-BR')}`
     if(chamado.termino){
-      chamado.termino = `${chamado.termino.getDate()}/${(chamado.termino.getMonth()+1).toString().padStart(2, '0')}/${chamado.termino.getFullYear()} ${chamado.termino.toLocaleTimeString()}`
+      chamado.termino = `${chamado.termino.getDate()}/${(chamado.termino.getMonth()+1).toString().padStart(2, '0')}/${chamado.termino.getFullYear()} ${chamado.termino.toLocaleTimeString('pt-BR')}`
     }
 
     res.json({chamado})
