@@ -167,7 +167,6 @@
           withCredentials: true
         })
         .then(response => {
-          console.log(response.status)
           if(response.status === 202){
             //location.reload()
             $(event).parent().parent().remove()

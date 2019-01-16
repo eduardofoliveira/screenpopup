@@ -4,6 +4,73 @@ const app = express.Router()
 const init  = (connection, ) => {
   app.use(require('../middleware/authMiddleware'))
 
+  app.get('/', async (req, res) => {
+    let [chamados] = await connection.query(`
+      select
+        chamado.id as id,
+        aberto as status,
+        de,
+        para,
+        inicio,
+        usuario.nome as nome_aberto_por
+      from
+        chamado
+      left join
+        usuario
+      on
+        chamado.fk_id_usuario = usuario.id
+      left join
+        usuario as fechado
+      on
+        chamado.fk_fechado_por = fechado.id
+      where
+        chamado.fk_id_dominio = ?
+      order by
+        chamado.id
+      desc
+    `, [req.session.user.fk_id_dominio])
+
+    res.render('chamados', { chamados })
+  })
+
+  app.get('/:id', async (req, res) => {
+    let { id } = req.params
+
+    let [[chamado]] = await connection.query(`
+      SELECT
+        chamado.id,
+        de,
+        para,
+        comentario,
+        de.descricao as de_descricao,
+        para.descricao as para_descricao,
+        inicio,
+        termino
+      FROM
+        chamado
+      LEFT JOIN
+        agenda as de
+      ON
+        chamado.de = de.did
+      LEFT JOIN
+        agenda as para
+      ON
+        chamado.para = para.did
+      WHERE
+        chamado.id = ?
+      ORDER BY
+        chamado.id
+      ASC
+    `, [id])
+
+    chamado.inicio = `${chamado.inicio.getDate()}/${(chamado.inicio.getMonth()+1).toString().padStart(2, '0')}/${chamado.inicio.getFullYear()} ${chamado.inicio.toLocaleTimeString()}`
+    if(chamado.termino){
+      chamado.termino = `${chamado.termino.getDate()}/${(chamado.termino.getMonth()+1).toString().padStart(2, '0')}/${chamado.termino.getFullYear()} ${chamado.termino.toLocaleTimeString()}`
+    }
+
+    res.json({chamado})
+  })
+
   app.delete('/:id', async (req, res) => {
     let { id } = req.params
 

@@ -5,27 +5,26 @@ const init  = (connection, io) => {
   app.get('/:from/:to/:user/:domain', async (req, res) => {
     const parametros = req.params
 
-    let [fromComment] = await connection.query('SELECT descricao FROM agenda, dominio WHERE agenda.fk_id_dominio = dominio.id and did = ? and dominio.dominio = ?', [parametros.from, parametros.domain])
-    if(fromComment.length === 1){
-      parametros.fromComment = fromComment[0].descricao
-    }else{
-      parametros.fromComment = ''
-    }
-    
-    let [to] = await connection.query('SELECT descricao, fraseologia FROM agenda, dominio WHERE agenda.fk_id_dominio = dominio.id and did = ? and dominio.dominio = ?', [parametros.to, parametros.domain])
-    if(to.length === 1){
-      parametros.toComment = to[0].descricao
-      parametros.script = to[0].fraseologia
-    }else{
-      parametros.toComment = ''
-      parametros.script = ''
+    let [[descricoes]] = await connection.query(`
+    select
+      (select descricao from agenda, dominio where did = ? and agenda.fk_id_dominio = dominio.id and dominio.dominio = ?) as desc_from,
+      (select descricao from agenda, dominio where did = ? and agenda.fk_id_dominio = dominio.id and dominio.dominio = ?) as desc_to,
+      (select fraseologia from agenda, dominio where did = ? and agenda.fk_id_dominio = dominio.id and dominio.dominio = ?) as script,
+      (SELECT usuario.id FROM dominio, usuario WHERE usuario.fk_id_dominio = dominio.id AND dominio.dominio = ? AND usuario.user_basix = ?) AS id_usuario,
+      (SELECT dominio.id FROM dominio, usuario WHERE usuario.fk_id_dominio = dominio.id AND dominio.dominio = ? AND usuario.user_basix = ?) AS id_dominio
+    `, [parametros.from, parametros.domain, parametros.to, parametros.domain, parametros.to, parametros.domain, parametros.domain, parametros.user, parametros.domain, parametros.user])
+
+    parametros.fromComment = descricoes.desc_from ? descricoes.desc_from : ''
+    parametros.toComment = descricoes.desc_to ? descricoes.desc_to : ''
+    parametros.script = descricoes.script ? descricoes.script : ''
+
+    if(Number.isInteger(descricoes.id_usuario) && Number.isInteger(descricoes.id_dominio)){
+      let [chamado] = await connection.query('INSERT INTO chamado (de, para, fk_id_usuario, fk_id_dominio) VALUES (?, ?, ?, ?)', [parametros.from, parametros.to, descricoes.id_usuario, descricoes.id_dominio])
+      parametros.id = chamado.insertId
+
+      io.emit(`${parametros.domain}-${parametros.user}`, parametros)
     }
 
-    let [[retorno]] = await connection.query('SELECT usuario.id AS id_usuario, dominio.id AS id_dominio FROM dominio, usuario WHERE usuario.fk_id_dominio = dominio.id AND dominio.dominio = ? AND usuario.user_basix = ?', [parametros.domain, parametros.user])
-    let [chamado] = await connection.query('INSERT INTO chamado (de, para, fk_id_usuario, fk_id_dominio) VALUES (?, ?, ?, ?)', [parametros.from, parametros.to, retorno.id_usuario, retorno.id_dominio])
-    parametros.id = chamado.insertId
-
-    io.emit(`${parametros.domain}-${parametros.user}`, parametros)
     res.send()
   })
 

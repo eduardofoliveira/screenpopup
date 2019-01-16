@@ -1,0 +1,138 @@
+<% include elements/header %>
+<% include elements/menu %>
+<div class="ui red segment list-users">
+  <p>Lista de chamados</p>
+
+  <table class="ui selectable inverted table">
+    <thead>
+      <tr>
+        <th></th>
+        <th>ID</th>
+        <th>Status</th>
+        <th>De</th>
+        <th>Para</th>
+        <th>Aberto para</th>
+        <th>Horario</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% chamados.map(chamado => { %>
+        <tr>
+          <td>
+            <button class="ui primary button" onclick="showModal(<%= chamado.id %>)">Detalhes</button>
+          </td>
+          <td><%= chamado.id %></td>
+          <td><%- chamado.status === 0 ? '<i class="large green checkmark icon">' : '<i class="large red x icon"></i>'%></i></td>
+          <td><%= chamado.de %></td>
+          <td><%= chamado.para %></td>
+          <td><%= chamado.nome_aberto_por %></td>
+          <td><%= chamado.inicio.getDate() + '/' + chamado.inicio.getMonth()+1 + '/' + chamado.inicio.getFullYear() + ' ' + chamado.inicio.toLocaleTimeString() %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<div class="ui small modal">
+  <div class="header">
+    Detalhes do chamado
+  </div>
+  <div class="content">
+    
+      <div class="ui form">
+          <div class="two fields">
+            <div class="field">
+              <label>Originador</label>
+              <div class="ui black message" id="from_numero">Numero</div>
+            </div>
+  
+            <div class="field">
+              <label>Descrição</label>
+              <div class="ui message" id="from_numero_descricao">Descrição</div>
+            </div>
+          </div>
+          
+          <div class="two fields">
+            <div class="field">
+              <label>Destino</label>
+              <div class="ui black message" id="to_numero">Numero</div>
+            </div>
+  
+            <div class="field">
+              <label>Descrição</label>
+              <div class="ui message" id="to_numero_descricao">Descrição</div>
+            </div>
+          </div>
+
+          <div class="two fields">
+            <div class="field">
+              <label>Inicio</label>
+              <div class="ui message" id="inicio">16/01/2019 12:07:00</div>
+            </div>
+  
+            <div class="field">
+              <label>Termino</label>
+              <div class="ui message" id="termino">16/01/2019 12:07:00</div>
+            </div>
+          </div>
+  
+          <div class="field">
+            <label>Comentarios da chamada</label>
+            <textarea rows="5" id="comentario"></textarea>
+          </div>
+        </div>
+    
+  </div>
+  <div class="actions">
+    <div class="ui negative button">
+      Fechar
+    </div>
+    <div class="ui positive right labeled icon button">
+      Alterar
+      <i class="checkmark icon"></i>
+    </div>
+  </div>
+</div>
+
+<script>
+function showModal(id){
+
+  axios.get(`/chamados/${id}`)
+  .then(response => {
+    $('#from_numero').text(response.data.chamado.de)
+    $('#from_numero_descricao').text(response.data.chamado.de_descricao ? response.data.chamado.de_descricao : 'Não encontrado')
+    $('#to_numero').text(response.data.chamado.para)
+    $('#to_numero_descricao').text(response.data.chamado.para_descricao ? response.data.chamado.para_descricao : 'Não encontrado')
+    $('#inicio').text(response.data.chamado.inicio.toLocaleString())
+    $('#termino').text(response.data.chamado.termino ? response.data.chamado.termino : 'Chamada em atividade')
+    $('#comentario').text(response.data.chamado.comentario)
+  })
+  
+  $('.ui.small.modal')
+  .modal({
+    closable  : true,
+    onDeny    : function(){
+      $('.ui.small.modal').modal('hide')
+      return false
+    },
+    onApprove : function() {
+      
+      axios.put(`/chamados/${id}`, {
+        comentario: $('#comentario').val()
+      })
+      .then(response => {
+        if(response.status === 200){
+          location.reload()
+        }
+        if(response.status === 404){
+          window.alert('Ocorreu um erro !')
+        }
+      })
+
+    }
+  })
+  .modal('show')
+
+}
+</script>
+<% include elements/footer %>
