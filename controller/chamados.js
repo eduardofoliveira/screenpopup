@@ -63,9 +63,9 @@ const init  = (connection, ) => {
       ASC
     `, [id])
 
-    chamado.inicio = `${chamado.inicio.getDate()}/${(chamado.inicio.getMonth()+1).toString().padStart(2, '0')}/${chamado.inicio.getFullYear()} ${chamado.inicio.getHours()}:${chamado.inicio.getMinutes()}:${chamado.inicio.getSeconds()}`
+    chamado.inicio = `${chamado.inicio.getDate()}/${(chamado.inicio.getMonth()+1).toString().padStart(2, '0')}/${chamado.inicio.getFullYear()} ${chamado.inicio.getHours().toString().padStart(2, '0')}:${chamado.inicio.getMinutes().toString().padStart(2, '0')}:${chamado.inicio.getSeconds().toString().padStart(2, '0')}`
     if(chamado.termino){
-      chamado.termino = `${chamado.termino.getDate()}/${(chamado.termino.getMonth()+1).toString().padStart(2, '0')}/${chamado.termino.getFullYear()} ${chamado.termino.getHours()}:${chamado.termino.getMinutes()}:${chamado.termino.getSeconds()}`
+      chamado.termino = `${chamado.termino.getDate()}/${(chamado.termino.getMonth()+1).toString().padStart(2, '0')}/${chamado.termino.getFullYear()} ${chamado.termino.getHours().toString().padStart(2, '0')}:${chamado.termino.getMinutes().toString().padStart(2, '0')}:${chamado.termino.getSeconds().toString().padStart(2, '0')}`
     }
 
     res.json({chamado})
