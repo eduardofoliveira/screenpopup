@@ -1,7 +1,7 @@
 const mysql = require('mysql2/promise')
 
 const connection = mysql.createPool({
-  host: 'duduhouse.dyndns.info',
+  host: '18.228.130.32',
   user: 'popup',
   password: 'B@lpha9001',
   database: 'popup',

@@ -142,7 +142,12 @@ const init = connection => {
 
     let errors = req.validationErrors()
     if(errors){
-      const [dominios] = await connection.query('SELECT * FROM dominio where id = ?', [req.session.user.fk_id_dominio])
+      if(req.session.user.tipo === 3){
+        [dominios] = await connection.query('SELECT * FROM dominio')
+      }else{
+        [dominios] = await connection.query('SELECT * FROM dominio where id = ?', [req.session.user.fk_id_dominio])
+      }
+
       res.render('usuarios-edt', { usuario, dominios, errors })
       return
     }
