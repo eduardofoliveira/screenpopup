@@ -1,7 +1,18 @@
 const express = require('express')
 const app = express.Router()
 
+let lista = []
+
 const init  = (connection, io) => {
+  app.post('/locus', (req, res) => {
+    let parametros = req.body
+
+    console.log('Chamada Locus')
+    console.log(parametros)
+
+    res.send()
+  })
+
   app.get('/:from/:to/:user/:domain/:callid/:event', async (req, res) => {
     const parametros = req.params
 
