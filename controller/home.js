@@ -8,7 +8,7 @@ const init = connection => {
 
     let [chamados] = await connection.query(`
       SELECT
-        chamado.id,
+        distinct chamado.id,
         de,
         para,
         comentario,
