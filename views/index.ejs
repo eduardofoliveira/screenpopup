@@ -3,6 +3,8 @@
 <div class="ui green segment list-users">
     <p>Chamados</p>
 
+    <%= JSON.stringify(chamados) %>
+
     <div class="ui top attached tabular menu">
       <% chamados.map((chamado, index) => { %>
         <%- `<a class='item ${index === chamados.length - 1 ? "active" : ""}' data-tab='${chamado.id}'>${chamado.id}</a>` %>
