@@ -14,11 +14,13 @@ const init  = (connection, io) => {
     }
 
     if(parametros.call.evento === 'CHANNEL_HANGUP_COMPLETE'){
-      lista.find((item, index) => {
-        if(item[1].callid === parametros.call.callid){
-            lista.splice(index)
-        }
-      })
+      if(lista.length > 0){
+        lista.find((item, index) => {
+          if(item[1].callid === parametros.call.callid){
+              lista.splice(index)
+          }
+        })
+      }
     }
 
     res.send()
