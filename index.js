@@ -31,14 +31,6 @@ const chamados = require('./controller/chamados')
 const init = async () => {
   const connection = await require('./service/mysql')
 
-  setInterval(async () => {
-    await connection.query('SELECT 1 + 1')
-      .catch(error => {
-        console.log(error)
-      })
-    console.log('KeepAlive DB ' + new Date().toLocaleString())
-  }, 120000)
-
   app.use('/login', login(connection))
   app.use('/chamada', chamada(connection, io))
   app.use('/chamados', chamados(connection))

@@ -11,4 +11,12 @@ const connection = mysql.createPool({
   queueLimit: 0
 })
 
+setInterval(async () => {
+  await connection.query('SELECT 1 + 1')
+    .catch(error => {
+      console.log(error)
+    })
+  console.log('KeepAlive DB ' + new Date().toLocaleString())
+}, 120000)
+
 module.exports = connection
