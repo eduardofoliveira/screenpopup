@@ -16,6 +16,7 @@ const init  = (connection, io) => {
     if(parametros.call.evento === 'CHANNEL_HANGUP_COMPLETE'){
       if(lista.length > 0){
         lista.find((item, index) => {
+          console.log(item)
           if(item[1].callid === parametros.call.callid){
               lista.splice(index)
           }
