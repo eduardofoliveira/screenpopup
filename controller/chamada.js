@@ -17,7 +17,7 @@ const init  = (connection, io) => {
         lista.find((item, index) => {
           if(item){
             if(item[1].callid === parametros.call.callid){
-              lista.splice(index)
+              lista.splice(index, 1)
             }
           }
         })
