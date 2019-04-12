@@ -1,16 +1,16 @@
 <% include elements/header %>
 <% include elements/menu %>
 <div class="ui green segment list-users">
-    <p>Chamados</p>
+  <p>Chamados</p>
 
-    <div class="ui top attached tabular menu">
-      <% chamados.map((chamado, index) => { %>
-        <%- `<a class='item ${index === chamados.length - 1 ? "active" : ""}' data-tab='${chamado.id}'>${chamado.id}</a>` %>
-      <% }) %>
-    </div>
-
+  <div class="ui top attached tabular menu">
     <% chamados.map((chamado, index) => { %>
-      <%- `<div class='ui bottom attached tab segment ${index === chamados.length - 1 ? "active" : ""}' data-tab='${chamado.id}'>
+    <%- `<a class='item ${index === chamados.length - 1 ? "active" : ""}' data-tab='${chamado.id}'>${chamado.id}</a>` %>
+    <% }) %>
+  </div>
+
+  <% chamados.map((chamado, index) => { %>
+  <%- `<div class='ui bottom attached tab segment ${index === chamados.length - 1 ? "active" : ""}' data-tab='${chamado.id}'>
         
         <div class="ui form">
           <div class="two fields">
@@ -55,9 +55,9 @@
         </div>
   
       </div>` %>
-    <% }) %>
+  <% }) %>
 
-    <!--<div class="ui bottom attached tab segment" data-tab="second">
+  <!--<div class="ui bottom attached tab segment" data-tab="second">
       Segunda chamada recebida
     </div>-->
 </div>
@@ -67,7 +67,7 @@
     Title
   </div>
   <div class="content">
-    
+
     <div class="modal-content-text">Context text</div>
     <div class="ui hidden divider"></div>
   </div>
@@ -87,7 +87,7 @@
   $('.menu .item').tab();
 
   const socket = io()
-  socket.on('<%= user.dominio %>-<%= user.nome %>', info => {
+  socket.on('<%= user.dominio %>-<%= user.user_basix %>', info => {
     //let id = new Date().getTime().toString().slice(9,13)
 
     $('body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu')
@@ -145,57 +145,57 @@
     $('body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu > a').click()
   })
 
-  function descartar(event){
+  function descartar(event) {
     $(event).parent().parent().remove()
     $('body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu').find('.active').remove()
     $('body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu > a:first-child').click()
   }
 
-  function deletarChamado(id, from, to, event){
+  function deletarChamado(id, from, to, event) {
     $('.ui.tiny.modal div.header').html('Remoção de chamado')
     $('.ui.tiny.modal div.content div.modal-content-text').html(`<div class="ui red message">id: ${id}<br>de: ${from}<br>para: ${to}</div>`)
 
     $('.ui.tiny.modal')
-    .modal({
-      closable  : true,
-      onDeny    : function(){
-        $('.ui.tiny.modal').modal('hide')
-        return false;
-      },
-      onApprove : function() {
-        axios.delete('/chamados/'+id, {
-          withCredentials: true
-        })
-        .then(response => {
-          if(response.status === 202){
-            //location.reload()
-            $(event).parent().parent().remove()
-            $('body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu').find('.active').remove()
-            $('body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu > a:first-child').click()
-          }
-          if(response.status === 204){
-            window.alert('Ocorreu um erro !')
-          }
-        })
-      }
-    })
-    .modal('show')
+      .modal({
+        closable: true,
+        onDeny: function () {
+          $('.ui.tiny.modal').modal('hide')
+          return false;
+        },
+        onApprove: function () {
+          axios.delete('/chamados/' + id, {
+            withCredentials: true
+          })
+            .then(response => {
+              if (response.status === 202) {
+                //location.reload()
+                $(event).parent().parent().remove()
+                $('body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu').find('.active').remove()
+                $('body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu > a:first-child').click()
+              }
+              if (response.status === 204) {
+                window.alert('Ocorreu um erro !')
+              }
+            })
+        }
+      })
+      .modal('show')
   }
 
-  function salvar(event, id){
+  function salvar(event, id) {
     let $TextArea = document.getElementById(`comentario-${id}`)
     console.log($TextArea.value, id)
 
-    axios.put(`/chamados/${id}`, { comentario: $TextArea.value } ,{ withCredentials: true })
-    .then(response => {
-      if(response.status === 200){
-        $(event).parent().parent().remove()
-        $('body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu').find('.active').remove()
-        $('body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu > a:first-child').click()
-      }else{
-        window.alert('Ocorreu um erro !')
-      }
-    })
+    axios.put(`/chamados/${id}`, { comentario: $TextArea.value }, { withCredentials: true })
+      .then(response => {
+        if (response.status === 200) {
+          $(event).parent().parent().remove()
+          $('body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu').find('.active').remove()
+          $('body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu > a:first-child').click()
+        } else {
+          window.alert('Ocorreu um erro !')
+        }
+      })
   }
 
 </script>
