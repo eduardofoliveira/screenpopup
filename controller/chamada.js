@@ -32,13 +32,13 @@ const init = (connection, io) => {
     console.log(parametros.domain);
     console.log(lista);
 
-    //if(parametros.domain === 'locus.brastel.com.br'){
-    lista.find((item, index) => {
-      if (item[1].from === parametros.from) {
-        parametros.to = item[1].to;
-      }
-    });
-    //}
+    if (parametros.domain === "locus.brastel.com.br") {
+      lista.find((item, index) => {
+        if (item[1].from === parametros.from) {
+          parametros.to = item[1].to;
+        }
+      });
+    }
 
     console.log(parametros);
 
