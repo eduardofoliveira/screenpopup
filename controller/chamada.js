@@ -1,49 +1,14 @@
 const express = require("express");
 const app = express.Router();
 
-let lista = [];
-
 const init = (connection, io) => {
-  app.post("/locus", (req, res) => {
-    let parametros = req.body;
-
-    console.log("Chegou info do ASTPP");
-
-    if (parametros.call.evento !== "CHANNEL_HANGUP_COMPLETE") {
-      lista.push([parametros.call.callid, parametros.call]);
-    }
-
-    if (parametros.call.evento === "CHANNEL_HANGUP_COMPLETE") {
-      lista.find((item, index) => {
-        if (item) {
-          if (item[1].callid === parametros.call.callid) {
-            lista.splice(index, 1);
-          }
-        }
-      });
-    }
-
-    res.send();
-  });
-
   app.get("/:from/:to/:user/:domain/:callid/:event", async (req, res) => {
     const parametros = req.params;
 
-    console.log(parametros.domain);
-    console.log(lista);
-
-    if (parametros.domain === "locus.brastel.com.br") {
-      lista.find((item, index) => {
-        if (item[1].from === parametros.from) {
-          parametros.to = item[1].to;
-        }
-      });
-    }
-
-    console.log(parametros);
+    console.log("Parametros recebidos via GET: \r\n" + parametros + "\r\n");
 
     if (parametros.event === "RINGING") {
-      console.log("Entou RINGING");
+      console.log("Entou RINGING para chamada: " + parametros.from + "\r\n");
       let [[descricoes]] = await connection.query(
         `
       select
@@ -67,7 +32,7 @@ const init = (connection, io) => {
         ]
       );
 
-      console.log(descricoes);
+      console.log("Resultado do query: \r\n" + descricoes + "\r\n");
 
       parametros.fromComment = descricoes.desc_from ? descricoes.desc_from : "";
       parametros.toComment = descricoes.desc_to ? descricoes.desc_to : "";
@@ -96,7 +61,9 @@ const init = (connection, io) => {
       return;
     }
     if (parametros.event === "DISCONNECTED") {
-      console.log("Entou DISCONNECTED");
+      console.log(
+        "Entou DISCONNECTED para a chamada: " + parametros.from + "\r\n"
+      );
       res.send();
       connection.query("UPDATE chamado SET termino = now() WHERE call_id = ?", [
         parametros.callid
