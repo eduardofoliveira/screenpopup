@@ -1,6 +1,9 @@
 body {
-  background-color: #ECF0F1;
+  background-color: #ecf0f1;
 }
 .page-login {
   padding-top: 15%;
+}
+img .imgcloud {
+  width: 200px;
 }

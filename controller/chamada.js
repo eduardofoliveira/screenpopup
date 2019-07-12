@@ -5,10 +5,8 @@ const init = (connection, io) => {
   app.get("/:from/:to/:user/:domain/:callid/:event", async (req, res) => {
     const parametros = req.params;
 
-    console.log("Parametros recebidos via GET: \r\n" + parametros + "\r\n");
-
     if (parametros.event === "RINGING") {
-      console.log("Entou RINGING para chamada: " + parametros.from + "\r\n");
+      res.send();
       let [[descricoes]] = await connection.query(
         `
       select
@@ -32,42 +30,25 @@ const init = (connection, io) => {
         ]
       );
 
-      console.log("Resultado do query: \r\n" + descricoes + "\r\n");
-
       parametros.fromComment = descricoes.desc_from ? descricoes.desc_from : "";
       parametros.toComment = descricoes.desc_to ? descricoes.desc_to : "";
       parametros.script = descricoes.script ? descricoes.script : "";
 
-      if (
-        Number.isInteger(descricoes.id_usuario) &&
-        Number.isInteger(descricoes.id_dominio)
-      ) {
+      if (Number.isInteger(descricoes.id_usuario) && Number.isInteger(descricoes.id_dominio)) {
         let [chamado] = await connection.query(
           "INSERT INTO chamado (de, para, call_id, fk_id_usuario, fk_id_dominio) VALUES (?, ?, ?, ?, ?)",
-          [
-            parametros.from,
-            parametros.to,
-            parametros.callid,
-            descricoes.id_usuario,
-            descricoes.id_dominio
-          ]
+          [parametros.from, parametros.to, parametros.callid, descricoes.id_usuario, descricoes.id_dominio]
         );
         parametros.id = chamado.insertId;
 
         io.emit(`${parametros.domain}-${parametros.user}`, parametros);
       }
 
-      res.send();
       return;
     }
     if (parametros.event === "DISCONNECTED") {
-      console.log(
-        "Entou DISCONNECTED para a chamada: " + parametros.from + "\r\n"
-      );
       res.send();
-      connection.query("UPDATE chamado SET termino = now() WHERE call_id = ?", [
-        parametros.callid
-      ]);
+      connection.query("UPDATE chamado SET termino = now() WHERE call_id = ?", [parametros.callid]);
       return;
     }
     res.send();
