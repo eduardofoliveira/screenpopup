@@ -1,33 +1,150 @@
-<% include elements/header %>
-<% include elements/menu %>
+<% include elements/header %> <% include elements/menu %>
 <div class="ui purple segment list-users">
   <p>Alterar contato</p>
   <a href="/contatos" class="ui red button">Voltar</a>
-  <% if(errors){ %>
-    <% errors.map(erro => { %>
-      <div class="ui red message"><%= erro.msg %></div>
-    <% }) %>
-  <% } %>
+  <% if(errors){ %> <% errors.map(erro => { %>
+  <div class="ui red message"><%= erro.msg %></div>
+  <% }) %> <% } %>
   <div class="ui inverted segment">
-      <form class="ui inverted form" method="post">
+    <form class="ui inverted form" method="post">
+      <div class="two fields">
+        <div class="field">
+          <label>DID</label>
+          <input placeholder="Numero" type="text" name="did" value="<%= contato.did %>" />
+        </div>
+        <div class="field">
+          <label>Descrição</label>
+          <input placeholder="descrição" type="text" name="descricao" value="<%= contato.descricao %>" />
+        </div>
+      </div>
+
+      <div class="custom-fields">
+        <% for(let i=0; i < detalhes.length; i++){ %> <% if(i % 2 === 0 && i+1 < detalhes.length){ %>
         <div class="two fields">
           <div class="field">
-            <label>DID</label>
-            <input placeholder="Numero" type="text" name="did" value="<%= contato.did %>">
+            <label><%= detalhes[i].nome_campo %></label>
+            <div class="ui action input">
+              <input
+                placeholder="<%= detalhes[i].nome_campo %>"
+                type="text"
+                name="<%= detalhes[i].nome_campo %>"
+                value="<%= detalhes[i].conteudo %>"
+              />
+              <button data-id="<%= detalhes[i].id %>" type="button" class="ui button delete-btn">Delete</button>
+            </div>
           </div>
+
           <div class="field">
-            <label>Descrição</label>
-            <input placeholder="descrição" type="text" name="descricao" value="<%= contato.descricao %>">
+            <label><%= detalhes[i+1].nome_campo %></label>
+            <div class="ui action input">
+              <input
+                placeholder="<%= detalhes[i+1].nome_campo %>"
+                type="text"
+                name="<%= detalhes[i+1].nome_campo %>"
+                value="<%= detalhes[i+1].conteudo %>"
+              />
+              <button data-id="<%= detalhes[i+1].id %>" type="button" class="ui button delete-btn">Delete</button>
+            </div>
           </div>
         </div>
-
-        <div class="field">
-          <label>Script</label>
-          <textarea placeholder="Script de atendimento" name="fraseologia"><%= contato.fraseologia %></textarea>
+        <% }else{ %> <% if(i === detalhes.length - 1 && i % 2 === 0){ %>
+        <div class="two fields">
+          <div class="field">
+            <label><%= detalhes[i].nome_campo %></label>
+            <div class="ui action input">
+              <input
+                placeholder="<%= detalhes[i].nome_campo %>"
+                type="text"
+                name="<%= detalhes[i].nome_campo %>"
+                value="<%= detalhes[i].conteudo %>"
+              />
+              <button data-id="<%= detalhes[i].id %>" type="button" class="ui button delete-btn">Delete</button>
+            </div>
+          </div>
         </div>
+        <% } %> <% } %> <% } %>
+      </div>
 
-        <button class="ui inverted green button" type="submit">Alterar</button>
-      </form>
-    </div>
+      <div class="fields">
+        <div class="field">
+          <div class="ui buttons">
+            <button type="button" class="ui button" onclick="addField()">Adicionar campo</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Script</label>
+        <textarea placeholder="Script de atendimento" name="fraseologia"><%= contato.fraseologia %></textarea>
+      </div>
+
+      <button class="ui inverted green button" type="submit">Alterar</button>
+    </form>
+  </div>
 </div>
+<script>
+  async function addField(evt) {
+    const { value: campo } = await Swal.fire({
+      title: "Insira o nome para o campo",
+      input: "text",
+      inputPlaceholder: "Nome do campo"
+    });
+
+    if (campo && /^[a-z0-9]*$/.test(campo)) {
+      $(".custom-fields").append(`
+        <div class="two fields">
+          <div class="field">
+            <label>${campo}</label>
+            <div class="ui action input">
+              <input placeholder="${campo}" type="text" name="${campo}" value="" />
+              <button type="button" class="ui button delete-btn">Delete</button>
+            </div>
+          </div>
+        </div>
+      `);
+
+      ativarButaoDelete();
+    } else {
+      Swal.fire({
+        type: "error",
+        title: "Erro no nome do campo",
+        text: "Aceito somente letras minusculas e numeros sem espaços!"
+      });
+    }
+  }
+
+  let ativarButaoDelete = () => {
+    $(".delete-btn").click(function(event) {
+      let elementoCampo = $(this).parents(".field");
+      let elementoLabel = $(this)
+        .parents(".field")
+        .find("label")
+        .html();
+      let id = $(this).attr("data-id");
+
+      Swal.fire({
+        title: "Confirmar ?",
+        text: `Tem certeza que deseja apagar o campo ${elementoLabel}`,
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Remover",
+        cancelButtonText: "Cancelar"
+      }).then(async result => {
+        if (result.value) {
+          let response = await axios.delete("/contatos/campo/" + id, {
+            withCredentials: true
+          });
+
+          if (response.status === 200) {
+            elementoCampo.remove();
+            Swal.fire("Deletado !", "Campo removido.", "success");
+          }
+        }
+      });
+    });
+  };
+  ativarButaoDelete();
+</script>
 <% include elements/footer %>

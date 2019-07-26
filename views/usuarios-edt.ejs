@@ -3,11 +3,15 @@
 <div class="ui red segment list-users">
   <p>Edição de usuário</p>
   <a href="/usuarios" class="ui red button">Voltar</a>
-  <% if(errors){ %>
+  <% 
+    let labelErrors = []
+    if(errors){ %>
     <% errors.map(erro => { %>
       <div class="ui red message"><%= erro.msg %></div>
     <% }) %>
-  <% } %>
+  <% 
+  labelErrors = errors.map(item => item.item)
+  } %>
   <div class="ui inverted segment">
       <form class="ui inverted form" method="post">
         <div class="ui segment">
@@ -20,42 +24,68 @@
         </div>
 
         <div class="two fields">
-          <div class="field">
+          <div class="field <%= (labelErrors.includes('nome') ? "error" : "") %>">
             <label>Nome</label>
             <input placeholder="Nome" type="text" name="nome" value="<%= usuario.nome %>">
           </div>
-          <div class="field">
+          <div class="field <%= (labelErrors.includes('user_basix') ? "error" : "") %>">
             <label>Usuário Basix</label>
             <input placeholder="Usuário Basix" type="text" name="user_basix" value="<%= usuario.user_basix %>">
           </div>
         </div>
 
         <div class="two fields">
-          <div class="field">
+          <div class="field <%= (labelErrors.includes('senha_conf') ? "error" : "") %>">
             <label>Senha</label>
             <input placeholder="Senha" type="password" name="senha" value="<%= usuario.senha %>">
           </div>
-          <div class="field">
+          <div class="field <%= (labelErrors.includes('senha_conf') ? "error" : "") %>">
             <label>Conf senha</label>
             <input placeholder="Confirmação de senha" type="password" name="senha_conf" value="<%= usuario.senha_conf %>">
           </div>
         </div>
 
         <div class="two fields">
-          <div class="field">
+          <div class="field <%= (labelErrors.includes('email') ? "error" : "") %>">
             <label>E-mail</label>
             <input placeholder="E-mail" type="text" name="email" value="<%= usuario.email %>">
           </div>
-        </div>
-
-        <div class="four fields">
-          <div class="field">
+          <div class="field <%= (labelErrors.includes('dominio') ? "error" : "") %>">
             <label>Dominio</label>
             <select name="dominio">
               <option value="">Selecione um dominio</option>
               <% dominios.map(item => { %>
                 <option value="<%= item.id %>" <%- (usuario.fk_id_dominio == item.id ? "selected" : "") %> <%- (usuario.dominio == item.id ? "selected" : "") %>><%= item.dominio %></option>
               <% }) %>
+            </select>
+          </div>
+        </div>
+
+        <div class="two fields">
+          <div class="field">
+            <label>Descrição:</label>
+            <textarea name="descricao" id="" cols="30" rows="10"><%= usuario.descricao %></textarea>
+          </div>
+          <div class="field <%= (labelErrors.includes('gravacao') ? "error" : "") %> <%= (labelErrors.includes('tipo') ? "error" : "") %> <%= (labelErrors.includes('loginlogout') ? "error" : "") %>">
+            <label>Login e Logout pelo contact</label>
+            <select name="loginlogout" class="select-padding">
+                <option value=""></option>
+                <option value="1" <%- (usuario.loginlogout == '1' ? "selected" : "") %>>Desabilitar</option>
+                <option value="2" <%- (usuario.loginlogout == '2' ? "selected" : "") %>>Habilitar</option>
+            </select>
+
+            <label>Log com gravação</label>
+            <select name="gravacao" class="select-padding">
+                <option value=""></option>
+                <option value="1" <%- (usuario.gravacao == '1' ? "selected" : "") %>>Desabilitar</option>
+                <option value="2" <%- (usuario.gravacao == '2' ? "selected" : "") %>>Habilitar</option>
+            </select>
+
+            <label>Permissão</label>
+            <select name="tipo" class="select-padding">
+                <option value=""></option>
+                <option value="1" <%- (usuario.tipo == '1' ? "selected" : "") %>>Usuário</option>
+                <option value="2" <%- (usuario.tipo == '2' ? "selected" : "") %>>Administrador</option>
             </select>
           </div>
         </div>

@@ -1,26 +1,41 @@
-body{
+body {
   background-color: cornflowerblue;
   padding-top: 53px;
 }
 .ui.menu .item img.logo {
   margin-right: 1.5em;
 }
-body > div.ui.fixed.inverted.menu > div > a.item.logoff{
-  color: #DB2828 !important;
+body > div.ui.fixed.inverted.menu > div > a.item.logoff {
+  color: #db2828 !important;
   font-weight: bold;
 }
-body > div.ui.red.segment.list-users, body > div.ui.green.segment.list-users,
-body > div.ui.purple.segment.list-users{
+body > div.ui.red.segment.list-users,
+body > div.ui.green.segment.list-users,
+body > div.ui.purple.segment.list-users {
   margin-left: 1%;
   margin-right: 1%;
 }
-body > div.ui.red.segment.list-users, body > div.ui.purple.segment.list-users{
-  background: rgba(255, 255, 255, 0.8)
+body > div.ui.red.segment.list-users,
+body > div.ui.purple.segment.list-users {
+  background: rgba(255, 255, 255, 0.8);
 }
-.modal-content-text{
+.modal-content-text {
   /*display: inline-block;
   font-size: 1.1em;*/
 }
-body > div.ui.red.segment.list-users > div > form > div.ui.segment > div > div > label{
-  color: black
+body > div.ui.red.segment.list-users > div > form > div.ui.segment > div > div > label {
+  color: black;
+}
+
+.select-padding {
+  margin-bottom: 17px;
+}
+
+.button-painel-chamado {
+  display: flex;
+  justify-content: space-between;
+}
+
+.label-input {
+  display: block !important;
 }

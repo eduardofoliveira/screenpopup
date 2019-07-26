@@ -16,10 +16,28 @@
   <body>
     <div class="page-login">
       <div class="ui centered grid container">
-        <img class="imgcloud" src="/cloud_logo.webp" alt="cloud logo" />
+        <img src="/cloud_logo.webp" alt="cloud logo" />
       </div>
       <div class="ui centered grid container">
         <div class="nine wide column">
+          <div class="ui fluid card cardcontact">
+            <div class="content">
+              <form class="ui form" method="POST">
+                <div class="field">
+                  <label>E-mail</label>
+                  <input type="text" name="email" placeholder="email" class="inputcontact" />
+                </div>
+                <div class="field">
+                  <label>Senha</label>
+                  <input type="password" name="senha" placeholder="senha" class="inputcontact" />
+                </div>
+                <button class="ui primary labeled icon button" type="submit">
+                  <i class="unlock alternate icon"></i>
+                  Login
+                </button>
+              </form>
+            </div>
+          </div>
           <% if(error){ %>
           <div class="ui icon warning message">
             <i class="lock icon"></i>
@@ -31,24 +49,6 @@
             </div>
           </div>
           <% } %>
-          <div class="ui fluid card">
-            <div class="content">
-              <form class="ui form" method="POST">
-                <div class="field">
-                  <label>E-mail</label>
-                  <input type="text" name="email" placeholder="email" />
-                </div>
-                <div class="field">
-                  <label>Senha</label>
-                  <input type="password" name="senha" placeholder="senha" />
-                </div>
-                <button class="ui primary labeled icon button" type="submit">
-                  <i class="unlock alternate icon"></i>
-                  Login
-                </button>
-              </form>
-            </div>
-          </div>
         </div>
       </div>
     </div>

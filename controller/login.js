@@ -12,6 +12,7 @@ const init = connection => {
 
     if(!email || !senha){
       res.render('login', { error: true })
+      return
     }
 
     //Gerar com peso 12

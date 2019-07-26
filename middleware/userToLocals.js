@@ -1,8 +1,8 @@
 const userToLocals = (req, res, next) => {
-  if(req.session.user){
-    res.locals.user = req.session.user
+  if (req.session.user) {
+    res.locals.user = req.session.user;
   }
-  next()
-}
+  next();
+};
 
-module.exports = userToLocals
+module.exports = userToLocals;

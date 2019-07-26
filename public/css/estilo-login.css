@@ -4,6 +4,82 @@ body {
 .page-login {
   padding-top: 15%;
 }
-img .imgcloud {
-  width: 200px;
+
+body > div > div:nth-child(1) > img {
+  -webkit-animation: fadein 2s;
+  -moz-animation: fadein 2s;
+  -ms-animation: fadein 2s;
+  -o-animation: fadein 2s;
+  animation: fadein 2s;
+}
+
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Firefox < 16 */
+@-moz-keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Safari, Chrome and Opera > 12.1 */
+@-webkit-keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Internet Explorer */
+@-ms-keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Opera < 12.1 */
+@-o-keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.inputcontact {
+  border: 2px solid rgba(34, 36, 38, 0.15) !important;
+  transition: all 0.5s ease !important;
+  -webkit-transition: all 0.5s ease !important;
+  -moz-transition: all 0.5s ease !important;
+  -ms-transition: all 0.5s ease !important;
+  -o-transition: all 0.5s ease !important;
+}
+
+.inputcontact:hover {
+  border: 2px solid #2185d0 !important;
+}
+
+.inputcontact:focus {
+  border: 2px solid #2185d0 !important;
+}
+
+.cardcontact {
+  border: 2px solid rgba(34, 36, 38, 0.15) !important;
+  margin-top: 50px !important;
 }

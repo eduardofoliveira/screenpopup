@@ -1,61 +1,76 @@
-<% include elements/header %>
-<% include elements/menu %>
+<% include elements/header %> <% include elements/menu %>
 <div class="ui green segment list-users">
   <p>Chamados</p>
 
   <div class="ui top attached tabular menu">
-    <% chamados.map((chamado, index) => { %>
-    <%- `<a class='item ${index === chamados.length - 1 ? "active" : ""}' data-tab='${chamado.id}'>${chamado.id}</a>` %>
-    <% }) %>
+    <% chamados.map((chamado, index) => { %> <%- `<a
+      class='item ${index === chamados.length - 1 ? "active" : ""}'
+      data-tab="${chamado.id}"
+      >${chamado.id}</a
+    >` %> <% }) %>
   </div>
 
-  <% chamados.map((chamado, index) => { %>
-  <%- `<div class='ui bottom attached tab segment ${index === chamados.length - 1 ? "active" : ""}' data-tab='${chamado.id}'>
-        
-        <div class="ui form">
-          <div class="two fields">
-            <div class="field">
-              <label>Originador</label>
-              <div class="ui black message">${chamado.de}</div>
-            </div>
-  
-            <div class="field">
-              <label>Descrição</label>
-              <div class="ui ${chamado.de_descricao ? 'blue' : 'red'} message">${chamado.de_descricao ? chamado.de_descricao : "Não encontrado"}</div>
-            </div>
+  <% chamados.map((chamado, index) => { %> <%- `
+  <div class='ui bottom attached tab segment ${index === chamados.length - 1 ? "active" : ""}' data-tab="${chamado.id}">
+    <div class="ui form">
+      <div class="two fields">
+        <div class="field">
+          <label>Originador</label>
+          <div class="ui black message">${chamado.de}</div>
+        </div>
+
+        <div class="field">
+          <label>Descrição</label>
+          <div class="ui ${chamado.de_descricao ? 'blue' : 'red'} message">
+            ${chamado.de_descricao ? chamado.de_descricao : "Não encontrado"}
           </div>
-          
-          <div class="two fields">
-            <div class="field">
-              <label>Destino</label>
-              <div class="ui black message">${chamado.para}</div>
-            </div>
-  
-            <div class="field">
-              <label>Descrição</label>
-              <div class="ui ${chamado.para_descricao ? 'blue' : 'red'} message">${chamado.para_descricao ? chamado.para_descricao : "Não encontrado"}</div>
-            </div>
+        </div>
+      </div>
+
+      <div class="two fields">
+        <div class="field">
+          <label>Destino</label>
+          <div class="ui black message">${chamado.para}</div>
+        </div>
+
+        <div class="field">
+          <label>Descrição</label>
+          <div class="ui ${chamado.para_descricao ? 'blue' : 'red'} message">
+            ${chamado.para_descricao ? chamado.para_descricao : "Não encontrado"}
           </div>
-  
-          <div class="field">
-            <label>Script</label>
-            <textarea readonly>${chamado.para_script ? chamado.para_script : ''}</textarea>
-          </div>
-          <div class="field">
-            <label>Comentarios da chamada</label>
-            <textarea rows="2" id="comentario-${chamado.id}">${chamado.comentario ? chamado.comentario : ''}</textarea>
-          </div>
-  
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Script</label>
+        <textarea readonly>${chamado.para_script ? chamado.para_script : ''}</textarea>
+      </div>
+      <div class="field">
+        <label>Comentarios da chamada</label>
+        <textarea rows="2" id="comentario-${chamado.id}">${chamado.comentario ? chamado.comentario : ''}</textarea>
+      </div>
+
+      <div class="button-painel-chamado">
+        <div>
           <button class="ui primary button" onclick="salvar(this, ${chamado.id})">
             Salvar
           </button>
-          <button class="ui red button" onclick="deletarChamado(${chamado.id}, '${chamado.de}', '${chamado.para}', this)">
+          <button
+            class="ui red button"
+            onclick="deletarChamado(${chamado.id}, '${chamado.de}', '${chamado.para}', this)"
+          >
             Descartar
           </button>
         </div>
-  
-      </div>` %>
-  <% }) %>
+        <div>
+          <button class="ui red button" onclick="descartarTodos()">
+            Descartar todos
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  ` %> <% }) %>
 
   <!--<div class="ui bottom attached tab segment" data-tab="second">
       Segunda chamada recebida
@@ -67,7 +82,6 @@
     Title
   </div>
   <div class="content">
-
     <div class="modal-content-text">Context text</div>
     <div class="ui hidden divider"></div>
   </div>
@@ -84,16 +98,17 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
-  $('.menu .item').tab();
+  $(".menu .item").tab();
 
-  const socket = io()
-  socket.on('<%= user.dominio %>-<%= user.user_basix %>', info => {
+  const socket = io();
+  socket.on("<%= user.dominio %>-<%= user.user_basix %>", info => {
     //let id = new Date().getTime().toString().slice(9,13)
 
-    $('body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu')
-      .append(`<a class='item' data-tab='${info.id}'>${info.id}</a>`)
+    $("body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu").append(
+      `<a class='item' data-tab='${info.id}'>${info.id}</a>`
+    );
 
-    $('body > div.ui.green.segment.list-users').append(`
+    $("body > div.ui.green.segment.list-users").append(`
       <div class="ui bottom attached tab segment" data-tab="${info.id}">
         
           <div class="ui form">
@@ -105,7 +120,9 @@
 
             <div class="field">
               <label>Descrição</label>
-              <div class="ui ${info.fromComment ? 'blue' : 'red'} message">${info.fromComment ? info.fromComment : "Não encontrado"}</div>
+              <div class="ui ${info.fromComment ? "blue" : "red"} message">${
+      info.fromComment ? info.fromComment : "Não encontrado"
+    }</div>
             </div>
           </div>
           
@@ -117,7 +134,9 @@
 
             <div class="field">
               <label>Descrição</label>
-              <div class="ui ${info.toComment ? 'blue' : 'red'} message">${info.toComment ? info.toComment : "Não encontrado"}</div>
+              <div class="ui ${info.toComment ? "blue" : "red"} message">${
+      info.toComment ? info.toComment : "Não encontrado"
+    }</div>
             </div>
           </div>
 
@@ -130,74 +149,136 @@
             <textarea rows="2" id="comentario-${info.id}"></textarea>
           </div>
 
-          <button class="ui primary button" onclick="salvar(this, ${info.id})">
-            Salvar
-          </button>
-          <button class="ui red button" onclick="deletarChamado(${info.id}, '${info.from}', '${info.to}', this)">
-            Descartar
-          </button>
+          <div class="button-painel-chamado">
+            <div>
+              <button class="ui primary button" onclick="salvar(this, ${info.id})">
+                Salvar
+              </button>
+              <button class="ui red button" onclick="deletarChamado(${info.id}, '${info.from}', '${info.to}', this)">
+                Descartar
+              </button>
+            </div>
+            <div>
+              <button class="ui red button" onclick="descartarTodos()">
+                Descartar todos
+              </button>
+            </div>
+          </div>
         </div>
 
       </div>
-    `)
+    `);
 
-    $('.menu .item').tab()
-    $('body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu > a').click()
-  })
+    $(".menu .item").tab();
+    $("body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu > a").click();
+  });
 
   function descartar(event) {
-    $(event).parent().parent().remove()
-    $('body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu').find('.active').remove()
-    $('body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu > a:first-child').click()
+    $(event)
+      .parent()
+      .parent()
+      .parent()
+      .parent()
+      .remove();
+    $("body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu")
+      .find(".active")
+      .remove();
+    $("body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu > a:first-child").click();
   }
 
   function deletarChamado(id, from, to, event) {
-    $('.ui.tiny.modal div.header').html('Remoção de chamado')
-    $('.ui.tiny.modal div.content div.modal-content-text').html(`<div class="ui red message">id: ${id}<br>de: ${from}<br>para: ${to}</div>`)
+    $(".ui.tiny.modal div.header").html("Remoção de chamado");
+    $(".ui.tiny.modal div.content div.modal-content-text").html(
+      `<div class="ui red message">id: ${id}<br>de: ${from}<br>para: ${to}</div>`
+    );
 
-    $('.ui.tiny.modal')
+    $(".ui.tiny.modal")
       .modal({
         closable: true,
-        onDeny: function () {
-          $('.ui.tiny.modal').modal('hide')
+        onDeny: function() {
+          $(".ui.tiny.modal").modal("hide");
           return false;
         },
-        onApprove: function () {
-          axios.delete('/chamados/' + id, {
-            withCredentials: true
-          })
+        onApprove: function() {
+          axios
+            .delete("/chamados/" + id, {
+              withCredentials: true
+            })
             .then(response => {
               if (response.status === 202) {
                 //location.reload()
-                $(event).parent().parent().remove()
-                $('body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu').find('.active').remove()
-                $('body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu > a:first-child').click()
+                $(event)
+                  .parent()
+                  .parent()
+                  .parent()
+                  .parent()
+                  .remove();
+                $("body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu")
+                  .find(".active")
+                  .remove();
+                $("body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu > a:first-child").click();
               }
               if (response.status === 204) {
-                window.alert('Ocorreu um erro !')
+                window.alert("Ocorreu um erro !");
               }
-            })
+            });
         }
       })
-      .modal('show')
+      .modal("show");
+  }
+
+  function descartarTodos() {
+    $(".ui.tiny.modal div.header").html("Apagar chamados abertos");
+    $(".ui.tiny.modal div.content div.modal-content-text").html(
+      `<div class="ui red message">Deseja realmente apagar todos os chamados abertos ?</div>`
+    );
+
+    $(".ui.tiny.modal")
+      .modal({
+        closable: true,
+        onDeny: function() {
+          $(".ui.tiny.modal").modal("hide");
+          return false;
+        },
+        onApprove: function() {
+          axios
+            .delete("/chamados/opens", {
+              withCredentials: true
+            })
+            .then(response => {
+              if (response.status === 200) {
+                location.reload();
+              }
+              if (response.status === 204) {
+                window.alert("Ocorreu um erro !");
+              }
+            });
+        }
+      })
+      .modal("show");
   }
 
   function salvar(event, id) {
-    let $TextArea = document.getElementById(`comentario-${id}`)
-    console.log($TextArea.value, id)
+    let $TextArea = document.getElementById(`comentario-${id}`);
+    console.log($TextArea.value, id);
 
-    axios.put(`/chamados/${id}`, { comentario: $TextArea.value }, { withCredentials: true })
-      .then(response => {
-        if (response.status === 200) {
-          $(event).parent().parent().remove()
-          $('body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu').find('.active').remove()
-          $('body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu > a:first-child').click()
-        } else {
-          window.alert('Ocorreu um erro !')
-        }
-      })
+    axios.put(`/chamados/${id}`, { comentario: $TextArea.value }, { withCredentials: true }).then(response => {
+      if (response.status === 200) {
+        $(event)
+          .parent()
+          .parent()
+          .parent()
+          .parent()
+          .remove();
+        $("body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu")
+          .find(".active")
+          .remove();
+        $("body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu > a:first-child").click();
+      } else {
+        window.alert("Ocorreu um erro !");
+      }
+    });
   }
-
 </script>
 
 <% include elements/footer %>

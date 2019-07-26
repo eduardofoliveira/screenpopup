@@ -12,16 +12,27 @@ create table usuario(
   user_basix varchar(30) not null,
   fk_id_dominio bigint,
   tipo tinyint not null default 1,
+  loginlogout tinyint not null default 2,
+  gravacao tinyint not null default 1,
+  descricao text,
   foreign key (fk_id_dominio) references dominio (id)
 );
 
 create table agenda(
   id bigint not null primary key auto_increment,
-  did varchar(15) not null,
+  did varchar(100) not null,
   descricao varchar(100) not null,
   fraseologia varchar(2048),
   fk_id_dominio bigint,
   foreign key (fk_id_dominio) references dominio (id)
+);
+
+create table campos_agenda(
+  id bigint not null primary key auto_increment,
+  nome_campo varchar(100),
+  conteudo varchar(255),
+  fk_id_agenda bigint,
+  foreign key (fk_id_agenda) references agenda (id)
 );
 
 create table chamado(
