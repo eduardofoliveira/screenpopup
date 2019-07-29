@@ -5,6 +5,16 @@ const init = connection => {
   app.use(require("../middleware/authMiddleware"));
 
   app.get("/", async (req, res) => {
+    let pageSize = req.query.pageSize || 10;
+    let currentPage = req.query.page || 0;
+    let offset = currentPage * pageSize;
+
+    let [[quantidade]] = await connection.query("SELECT count(*) as total FROM chamado WHERE fk_id_dominio = ?", [
+      req.session.user.fk_id_dominio
+    ]);
+
+    let totalPages = parseInt(quantidade.total / pageSize);
+
     let [chamados] = await connection.query(
       `
       select
@@ -29,11 +39,12 @@ const init = connection => {
       order by
         chamado.id
       desc
+      LIMIT ${offset}, ${pageSize}
     `,
       [req.session.user.fk_id_dominio]
     );
 
-    res.render("chamados", { chamados });
+    res.render("chamados", { chamados, pagination: { pages: totalPages, pageSize, currentPage } });
   });
 
   app.get("/:id", async (req, res) => {

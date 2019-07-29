@@ -5,10 +5,50 @@ const init = connection => {
   app.use(require("../middleware/authMiddleware"));
 
   app.get("/", async (req, res) => {
-    let [contatos] = await connection.query("SELECT * FROM agenda WHERE fk_id_dominio = ? order by did asc", [
+    let pageSize = req.query.pageSize || 10;
+    let currentPage = req.query.page || 0;
+    let offset = currentPage * pageSize;
+    let SearchTerm = req.query.term || null;
+    let searchNumber = req.query.number || null;
+
+    let [[quantidade]] = await connection.query("SELECT count(*) as total FROM agenda WHERE fk_id_dominio = ?", [
       req.session.user.fk_id_dominio
     ]);
-    res.render("contatos", { contatos });
+
+    let totalPages = parseInt(quantidade.total / pageSize);
+    let contatos = null;
+
+    if (!SearchTerm && !searchNumber) {
+      let [contatosBanco] = await connection.query(
+        `SELECT * FROM agenda WHERE fk_id_dominio = ? order by did asc limit ${offset}, ${pageSize}`,
+        [req.session.user.fk_id_dominio]
+      );
+
+      contatos = contatosBanco;
+    } else if (SearchTerm && !searchNumber) {
+      let [contatosBanco] = await connection.query(
+        `SELECT * FROM agenda WHERE fk_id_dominio = ? and descricao like ? order by did asc limit ${offset}, ${pageSize}`,
+        [req.session.user.fk_id_dominio, `%${SearchTerm}%`]
+      );
+
+      contatos = contatosBanco;
+    } else if (!SearchTerm && searchNumber) {
+      let [contatosBanco] = await connection.query(
+        `SELECT * FROM agenda WHERE fk_id_dominio = ? and did like ? order by did asc limit ${offset}, ${pageSize}`,
+        [req.session.user.fk_id_dominio, `%${searchNumber}%`]
+      );
+
+      contatos = contatosBanco;
+    } else {
+      let [contatosBanco] = await connection.query(
+        `SELECT * FROM agenda WHERE fk_id_dominio = ? and did like ? and descricao like ? order by did asc limit ${offset}, ${pageSize}`,
+        [req.session.user.fk_id_dominio, `%${searchNumber}%`, `%${SearchTerm}%`]
+      );
+
+      contatos = contatosBanco;
+    }
+
+    res.render("contatos", { contatos, pagination: { pages: totalPages, pageSize, currentPage } });
   });
 
   app.get("/adicionar", (req, res) => {

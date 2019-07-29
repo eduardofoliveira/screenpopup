@@ -2,6 +2,14 @@
 <div class="ui purple segment list-users">
   <p>Agenda de contatos</p>
   <a href="/contatos/adicionar" class="ui green button">Adicionar</a>
+  <div class="ui icon input">
+    <input type="text" placeholder="Numero..." class="buscaNum"/>
+    <i class="search icon"></i>
+  </div>
+  <div class="ui icon input">
+      <input type="text" placeholder="Descrição..." class="buscaDesc"/>
+      <i class="search icon"></i>
+    </div>
 
   <table class="ui selectable inverted table">
     <thead>
@@ -17,21 +25,52 @@
         <td data-label="ID"><%= contato.did %></td>
         <td data-label="Domínio"><%= contato.descricao %></td>
         <td>
-          <a
-            href="/contatos/editar/<%= contato.id %>"
-            class="ui inverted yellow button"
-            >Editar</a
-          >
-          <button
-            class="ui inverted red button"
-            onclick="deletarModal(<%= `${contato.id}, ${contato.did}` %>)"
-          >
+          <a href="/contatos/editar/<%= contato.id %>" class="mini ui inverted yellow button">Editar</a>
+          <button class="mini ui inverted red button" onclick="deletarModal(<%= `${contato.id}, ${contato.did}` %>)">
             Remover
           </button>
         </td>
       </tr>
       <% }) %>
     </tbody>
+    <tfoot>
+        <tr>
+          <th colspan="7">
+            <div class="ui right floated pagination menu inverted">
+              <% if(pagination.currentPage > 0){ %>
+              <a class="icon item" href="/contatos?page=<%= pagination.currentPage - 1 %>&pageSize=<%= pagination.pageSize %>">
+                <i class="left chevron icon"></i>
+              </a>
+              <% } %>
+  
+              <% for(let i = 0; i < pagination.pages; i++){ %>
+                <% if(i >= parseInt(pagination.currentPage) - parseInt(4)){ %>
+                  <% if(i <= parseInt(pagination.currentPage) + parseInt(4)){ %>
+                  <a class="<%= (i == pagination.currentPage) ? "active" : "" %> item" href="/contatos?page=<%= i %>&pageSize=<%= pagination.pageSize %>"><%= (i+1) %></a>
+                  <% } %>
+                <% } %>
+              <% } %>
+  
+              <% if(pagination.currentPage < pagination.pages - 1){ %>
+              <a class="icon item" href="/contatos?page=<%= parseInt(pagination.currentPage) + parseInt(1) %>&pageSize=<%= pagination.pageSize %>">
+                <i class="right chevron icon"></i>
+              </a>
+              <% } %>
+            </div>
+          </th>
+        </tr>
+        <tr>
+          <th colspan="7">
+              <div class="ui right floated pagination menu inverted aligned">
+                  <a class="item <%= (pagination.pageSize == 10) ? "active" : "" %>" href="/contatos?pageSize=10">10</a>
+                  <a class="item <%= (pagination.pageSize == 20) ? "active" : "" %>" href="/contatos?pageSize=20">20</a>
+                  <a class="item <%= (pagination.pageSize == 50) ? "active" : "" %>" href="/contatos?pageSize=50">50</a>
+                  <a class="item <%= (pagination.pageSize == 100) ? "active" : "" %>" href="/contatos?pageSize=100">100</a>
+                  <a class="item <%= (pagination.pageSize == 200) ? "active" : "" %>" href="/contatos?pageSize=200">200</a>
+              </div>
+          </th>
+        </tr>
+      </tfoot>
   </table>
 </div>
 
@@ -57,9 +96,7 @@
 <script>
   function deletarModal(id, numero) {
     $(".ui.tiny.modal div.header").html("Deletar contato");
-    $(".ui.tiny.modal div.content div.modal-content-text").html(
-      `<div class="ui red message">numero: ${numero}</div>`
-    );
+    $(".ui.tiny.modal div.content div.modal-content-text").html(`<div class="ui red message">numero: ${numero}</div>`);
 
     $(".ui.tiny.modal")
       .modal({
@@ -74,7 +111,6 @@
               withCredentials: true
             })
             .then(response => {
-              console.log(response.status);
               if (response.status === 202) {
                 location.reload();
               }
@@ -86,5 +122,33 @@
       })
       .modal("show");
   }
+
+  $('.buscaNum').on('keydown', (e) => {
+    if(e.which == 13){
+        if($('.buscaNum').val() && $('.buscaDesc').val()){
+          window.location.href = window.location.origin + `/contatos?term=${$('.buscaDesc').val()}&number=${$('.buscaNum').val()}&pageSize=200`
+        }
+        if($('.buscaNum').val()){
+          window.location.href = window.location.origin + `/contatos?number=${$('.buscaNum').val()}&pageSize=200`
+        }
+        if($('.buscaDesc').val()){
+          window.location.href = window.location.origin + `/contatos?term=${$('.buscaDesc').val()}&pageSize=200`
+        }
+    }
+  })
+
+  $('.buscaDesc').on('keydown', (e) => {
+    if(e.which == 13){
+        if($('.buscaNum').val() && $('.buscaDesc').val()){
+          window.location.href = window.location.origin + `/contatos?term=${$('.buscaDesc').val()}&number=${$('.buscaNum').val()}&pageSize=200`
+        }
+        if($('.buscaNum').val()){
+          window.location.href = window.location.origin + `/contatos?number=${$('.buscaNum').val()}&pageSize=200`
+        }
+        if($('.buscaDesc').val()){
+          window.location.href = window.location.origin + `/contatos?term=${$('.buscaDesc').val()}&pageSize=200`
+        }
+    }
+  })
 </script>
 <% include elements/footer %>
