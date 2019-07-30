@@ -90,6 +90,28 @@
           </div>
         </div>
 
+        <div class="ui inverted horizontal divider">
+          Integração Dendron - Supernova
+        </div>
+
+        <div class="three fields">
+          <div class="field">
+            <label>E-mail de login</label>
+            <input placeholder="E-mail de login" type="text" name="emailDendron" value="<%= usuario.emailDendron %>">
+          </div>
+          <div class="field">
+            <label>Token do usuário</label>
+            <input placeholder="Token" type="text" name="tokenDendron" value="<%= usuario.tokenDendron %>">
+          </div>
+          <div class="field">
+            <label>Link de gravação na descrição do Ticket</label>
+            <select name="gravacaoDendron" class="select-padding">
+                <option value=""></option>
+                <option value="1" <%- (usuario.gravacaoDendron == '1' ? "selected" : "") %>>Desabilitar</option>
+                <option value="2" <%- (usuario.gravacaoDendron == '2' ? "selected" : "") %>>Habilitar</option>
+            </select>
+          </div>
+        </div>
         <button class="ui inverted green button" type="submit">Alterar</button>
       </form>
     </div>

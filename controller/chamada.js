@@ -54,6 +54,12 @@ const init = (connection, io) => {
     res.send();
   });
 
+  app.get("/:from/:to/:user/:domain/:callid/:event/:history", async (req, res) => {
+    res.send();
+    console.log("Send To Dendron");
+    console.log(req.params);
+  });
+
   return app;
 };
 
