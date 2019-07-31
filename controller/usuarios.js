@@ -133,7 +133,7 @@ const init = connection => {
     const { id } = req.params;
 
     let [usuario] = await connection.query(
-      "SELECT ativo, nome, user_basix, email, fk_id_dominio, tipo, loginlogout, gravacao, descricao FROM usuario WHERE id = ?",
+      "SELECT ativo, nome, user_basix, email, fk_id_dominio, tipo, loginlogout, gravacao, descricao, dendron_operador, dendron_token FROM usuario WHERE id = ?",
       [id]
     );
     if (usuario.length === 1) {
@@ -193,7 +193,7 @@ const init = connection => {
       if (usuario.senha.length > 0) {
         usuario.senha = await bcrypt.hash(usuario.senha, 12);
         await connection.query(
-          "UPDATE usuario set ativo = ?, nome = ?, email = ?, senha = ?, user_basix = ?, loginlogout = ?, gravacao = ?, tipo = ?, descricao = ?, fk_id_dominio = ? WHERE id = ?",
+          "UPDATE usuario set ativo = ?, nome = ?, email = ?, senha = ?, user_basix = ?, loginlogout = ?, gravacao = ?, tipo = ?, descricao = ?, dendron_operador = ?, dendron_token = ?, fk_id_dominio = ? WHERE id = ?",
           [
             usuario.ativo,
             usuario.nome,
@@ -204,13 +204,15 @@ const init = connection => {
             usuario.gravacao,
             usuario.tipo,
             usuario.descricao,
+            usuario.dendron_operador,
+            usuario.dendron_token,
             usuario.dominio,
             id
           ]
         );
       } else {
         await connection.query(
-          "UPDATE usuario set ativo = ?, nome = ?, email = ?, user_basix = ?, loginlogout = ?, gravacao = ?, tipo = ?, descricao = ?, fk_id_dominio = ? WHERE id = ?",
+          "UPDATE usuario set ativo = ?, nome = ?, email = ?, user_basix = ?, loginlogout = ?, gravacao = ?, tipo = ?, descricao = ?, dendron_operador = ?, dendron_token = ?, fk_id_dominio = ? WHERE id = ?",
           [
             usuario.ativo,
             usuario.nome,
@@ -220,6 +222,8 @@ const init = connection => {
             usuario.gravacao,
             usuario.tipo,
             usuario.descricao,
+            usuario.dendron_operador,
+            usuario.dendron_token,
             usuario.dominio,
             id
           ]
@@ -229,7 +233,7 @@ const init = connection => {
       if (usuario.senha.length > 0) {
         usuario.senha = await bcrypt.hash(usuario.senha, 12);
         await connection.query(
-          "UPDATE usuario set ativo = ?, nome = ?, email = ?, senha = ?, user_basix = ?, loginlogout = ?, gravacao = ?, tipo = ?, descricao = ? WHERE id = ? AND fk_id_dominio = ?",
+          "UPDATE usuario set ativo = ?, nome = ?, email = ?, senha = ?, user_basix = ?, loginlogout = ?, gravacao = ?, tipo = ?, descricao = ?, dendron_operador = ?, dendron_token = ? WHERE id = ? AND fk_id_dominio = ?",
           [
             usuario.ativo,
             usuario.nome,
@@ -240,13 +244,15 @@ const init = connection => {
             usuario.gravacao,
             usuario.tipo,
             usuario.descricao,
+            usuario.dendron_operador,
+            usuario.dendron_token,
             id,
             req.session.user.fk_id_dominio
           ]
         );
       } else {
         await connection.query(
-          "UPDATE usuario set ativo = ?, nome = ?, email = ?, user_basix = ?, loginlogout = ?, gravacao = ?, tipo = ?, descricao = ? WHERE id = ? AND fk_id_dominio = ?",
+          "UPDATE usuario set ativo = ?, nome = ?, email = ?, user_basix = ?, loginlogout = ?, gravacao = ?, tipo = ?, descricao = ?, dendron_operador = ?, dendron_token = ? WHERE id = ? AND fk_id_dominio = ?",
           [
             usuario.ativo,
             usuario.nome,
@@ -256,6 +262,8 @@ const init = connection => {
             usuario.gravacao,
             usuario.tipo,
             usuario.descricao,
+            usuario.dendron_operador,
+            usuario.dendron_token,
             id,
             req.session.user.fk_id_dominio
           ]

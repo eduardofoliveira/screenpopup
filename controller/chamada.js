@@ -1,5 +1,11 @@
 const express = require("express");
 const app = express.Router();
+const axios = require("axios");
+const querystring = require("querystring");
+
+const api = axios.create({
+  baseURL: "https://api.netoffice.com.br/v1/"
+});
 
 const init = (connection, io) => {
   app.get("/:from/:to/:user/:domain/:callid/:event", async (req, res) => {
@@ -56,8 +62,65 @@ const init = (connection, io) => {
 
   app.get("/:from/:to/:user/:domain/:callid/:event/:history", async (req, res) => {
     res.send();
-    console.log("Send To Dendron");
-    console.log(req.params);
+
+    let { from, history, user, domain } = req.params;
+
+    let [[retorno]] = await connection.query(
+      "SELECT dendron_operador, dendron_token FROM usuario WHERE user_basix = ? and fk_id_dominio = (SELECT id FROM dominio WHERE dominio = ?)",
+      [user, domain]
+    );
+
+    let response = await api.get("/GetClientes", { headers: { token: retorno.dendron_token } });
+
+    let clienteId = response.data.reduce((retorno, item) => {
+      if (item.telefone1) {
+        if (item.telefone1.replace(/\(|\)| |-/g, "") === from) {
+          retorno = item.id;
+        }
+      }
+      if (item.telefone2) {
+        if (item.telefone2.replace(/\(|\)| |-/g, "") === from) {
+          retorno = item.id;
+        }
+      }
+
+      return retorno;
+    });
+
+    if (clienteId) {
+      response = await api.post(
+        "/AddTicket",
+        querystring.stringify({
+          usuario: "api",
+          operador: retorno.dendron_operador,
+          assunto: history.split(".")[history.split(".").length - 1],
+          descricao: history.split(".").join(" -> "),
+          cliente_id: clienteId
+        }),
+        {
+          headers: {
+            token: retorno.dendron_token,
+            "Content-Type": "application/x-www-form-urlencoded"
+          }
+        }
+      );
+    } else {
+      response = await api.post(
+        "/AddTicket",
+        querystring.stringify({
+          usuario: "api",
+          operador: retorno.dendron_operador,
+          assunto: history.split(".")[history.split(".").length - 1],
+          descricao: history.split(".").join(" -> ")
+        }),
+        {
+          headers: {
+            token: retorno.dendron_token,
+            "Content-Type": "application/x-www-form-urlencoded"
+          }
+        }
+      );
+    }
   });
 
   return app;
