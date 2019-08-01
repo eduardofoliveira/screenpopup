@@ -93,6 +93,7 @@ const init = (connection, io) => {
         querystring.stringify({
           usuario: "api",
           operador: retorno.dendron_operador,
+          tags: 'telefonia',
           assunto: history.split(".")[history.split(".").length - 1],
           descricao: history.split(".").join(" -> "),
           cliente_id: clienteId
@@ -110,6 +111,7 @@ const init = (connection, io) => {
         querystring.stringify({
           usuario: "api",
           operador: retorno.dendron_operador,
+          tags: 'telefonia',
           assunto: history.split(".")[history.split(".").length - 1],
           descricao: history.split(".").join(" -> ")
         }),
