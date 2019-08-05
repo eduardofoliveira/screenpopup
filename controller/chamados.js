@@ -112,7 +112,7 @@ const init = connection => {
 
   app.delete("/opens", async (req, res) => {
     try {
-      await connection.query("DELETE FROM chamado WHERE fk_id_usuario = ? and fk_id_dominio = ?", [
+      await connection.query("DELETE FROM chamado WHERE fk_id_usuario = ? and fk_id_dominio = ? and aberto = 1", [
         req.session.user.id,
         req.session.user.fk_id_dominio
       ]);

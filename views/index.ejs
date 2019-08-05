@@ -13,10 +13,10 @@
   <% chamados.map((chamado, index) => { %> <%- `
   <div class='ui bottom attached tab segment ${index === chamados.length - 1 ? "active" : ""}' data-tab="${chamado.id}">
     <div class="ui form">
-      <div class="two fields">
+      <div class="four fields">
         <div class="field">
           <label>Originador</label>
-          <div class="ui black message">${chamado.de}</div>
+          <div class="ui black message"><a href="/contatos/editar/${chamado.from_id}">${chamado.de}</a></div>
         </div>
 
         <div class="field">
@@ -25,9 +25,7 @@
             ${chamado.de_descricao ? chamado.de_descricao : "Não encontrado"}
           </div>
         </div>
-      </div>
 
-      <div class="two fields">
         <div class="field">
           <label>Destino</label>
           <div class="ui black message">${chamado.para}</div>
@@ -40,7 +38,71 @@
           </div>
         </div>
       </div>
+      ` %> <% if(chamado.detalhes.length > 0 || chamado.historico.length > 0){ %>
 
+      <div class="ui styled fluid accordion">
+        <% if(chamado.detalhes.length > 0){ %>
+        <div class="title">
+          <i class="dropdown icon"></i>
+          Detalhes
+        </div>
+        <div class="content">
+          <% chamado.detalhes.map((item, index) => { %>
+            <% if (index !== 0 && index % 4 === 0) { %>
+              </div>
+            <% } %>
+
+            <% if (index % 4 === 0) { %>
+              <div class="four fields">
+            <% } %>
+
+            <div class="field">
+              <label><%= item.nome_campo %></label>
+              <div class="ui blue message"><%= item.conteudo %></div>
+            </div>
+
+
+            <% if (index !== 0 && index === chamado.detalhes.length - 1) { %>
+              </div>
+            <% } %>
+          <% }) %>
+        </div>
+        <% } %>
+        <% if(chamado.historico.length > 0){ %>
+        <div class="title">
+          <i class="dropdown icon"></i>
+          Historico
+        </div>
+        <div class="content">
+          <% chamado.historico.map(item => { %>
+          <div class="four fields">
+            <div class="field">
+              <label>ID</label>
+              <div class="ui black message"><%= item.id %></div>
+            </div>
+            <div class="field">
+              <label>Data</label>
+              <div class="ui black message"><%= item.inicio %></div>
+            </div>
+            <div class="field">
+              <label>Status</label>
+              <div class="ui <%= (item.status === 'Aberto') ? 'red' : 'blue' %> message"><%= item.status %></div>
+            </div>
+            <div class="field">
+              <label>Usuário</label>
+              <div class="ui black message"><%= item.nome %></div>
+            </div>
+          </div>
+          <div class="field">
+            <label>Comentario</label>
+            <textarea rows="2"><%= item.comentario ? item.comentario : ''%></textarea>
+          </div>
+          <% }) %>
+        </div>
+        <% } %>
+      </div>
+
+      <% } %> <%- `
       <div class="field">
         <label>Script</label>
         <textarea readonly>${chamado.para_script ? chamado.para_script : ''}</textarea>
@@ -100,6 +162,8 @@
 <script>
   $(".menu .item").tab();
 
+  $(".ui.accordion").accordion();
+
   const socket = io();
   socket.on("<%= user.dominio %>-<%= user.user_basix %>", info => {
     //let id = new Date().getTime().toString().slice(9,13)
@@ -108,14 +172,14 @@
       `<a class='item' data-tab='${info.id}'>${info.id}</a>`
     );
 
-    $("body > div.ui.green.segment.list-users").append(`
+    let injectHtml = `
       <div class="ui bottom attached tab segment" data-tab="${info.id}">
         
           <div class="ui form">
-          <div class="two fields">
+          <div class="four fields">
             <div class="field">
               <label>Originador</label>
-              <div class="ui black message">${info.from}</div>
+              <div class="ui black message"><a href="/contatos/editar/${info.id_from}">${info.from}</a></div>
             </div>
 
             <div class="field">
@@ -124,9 +188,7 @@
       info.fromComment ? info.fromComment : "Não encontrado"
     }</div>
             </div>
-          </div>
-          
-          <div class="two fields">
+
             <div class="field">
               <label>Destino</label>
               <div class="ui black message">${info.to}</div>
@@ -138,8 +200,92 @@
       info.toComment ? info.toComment : "Não encontrado"
     }</div>
             </div>
-          </div>
+          </div>`
 
+
+          
+        
+
+          if(info.detalhes.length > 0 || info.historico.length > 0){
+            injectHtml += `<div class="ui styled fluid accordion">`
+              if(info.detalhes.length > 0){
+                injectHtml += `<div class="title">
+                  <i class="dropdown icon"></i>
+                  Detalhes
+                </div>
+                <div class="content">`
+                
+                
+
+                info.detalhes.map((item, index) => {
+                  if (index !== 0 && index % 4 === 0) {
+                    injectHtml += `</div>`
+                  }
+
+                  if (index % 4 === 0) {
+                    injectHtml += `<div class="four fields">`
+                  }
+
+                  injectHtml += `<div class="field">
+                    <label>${ item.nome_campo }</label>
+                    <div class="ui blue message">${ item.conteudo }</div>
+                  </div>`
+
+
+                  if (index !== 0 && index === info.detalhes.length - 1) {
+                    injectHtml += `</div>`
+                  }
+                })
+
+                injectHtml += `</div>`
+              }
+              if(info.historico.length > 0){
+
+
+
+                injectHtml += `<div class="title">
+          <i class="dropdown icon"></i>
+          Historico
+        </div>
+        <div class="content">`
+
+          info.historico.map(item => {
+            injectHtml += `<div class="four fields">
+            <div class="field">
+              <label>ID</label>
+              <div class="ui black message">${ item.id }</div>
+            </div>
+            <div class="field">
+              <label>Data</label>
+              <div class="ui black message">${ item.inicio }</div>
+            </div>
+            <div class="field">
+              <label>Status</label>
+              <div class="ui ${ (item.status === 'Aberto') ? 'red' : 'blue' } message">${ item.status }</div>
+            </div>
+            <div class="field">
+              <label>Usuário</label>
+              <div class="ui black message">${ item.nome }</div>
+            </div>
+          </div>
+          <div class="field">
+            <label>Comentario</label>
+            <textarea rows="2">${ item.comentario ? item.comentario : ''}</textarea>
+          </div>`
+          })
+          
+          injectHtml += `</div>`
+                
+
+
+
+              }
+              
+              injectHtml += `</div>`
+          }
+
+          injectHtml += `
+          
           <div class="field">
             <label>Script</label>
             <textarea readonly>${info.script}</textarea>
@@ -167,9 +313,12 @@
         </div>
 
       </div>
-    `);
+    `
+
+    $("body > div.ui.green.segment.list-users").append(injectHtml)
 
     $(".menu .item").tab();
+    $(".ui.accordion").accordion();
     $("body > div.ui.green.segment.list-users > div.ui.top.attached.tabular.menu > a").click();
   });
 
@@ -260,7 +409,6 @@
 
   function salvar(event, id) {
     let $TextArea = document.getElementById(`comentario-${id}`);
-    console.log($TextArea.value, id);
 
     axios.put(`/chamados/${id}`, { comentario: $TextArea.value }, { withCredentials: true }).then(response => {
       if (response.status === 200) {
