@@ -37,6 +37,13 @@ create table campos_agenda(
   foreign key (fk_id_agenda) references agenda (id)
 );
 
+create table template_agenda(
+  id bigint not null primary key auto_increment,
+  nome_campo varchar(100),
+  fk_id_dominio bigint,
+  foreign key (fk_id_dominio) references dominio (id)
+);
+
 create table chamado(
   id bigint not null primary key auto_increment,
   de varchar(15) not null,
