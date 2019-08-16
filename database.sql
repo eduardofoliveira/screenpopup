@@ -15,6 +15,7 @@ create table usuario(
   loginlogout tinyint not null default 2,
   gravacao tinyint not null default 1,
   descricao text,
+  ativo_dendron tinyint not null default 0,
   dendron_operador varchar(255),
   dendron_token varchar(255),
   foreign key (fk_id_dominio) references dominio (id)
@@ -37,6 +38,13 @@ create table campos_agenda(
   foreign key (fk_id_agenda) references agenda (id)
 );
 
+create table template_agenda(
+  id bigint not null primary key auto_increment,
+  nome_campo varchar(100),
+  fk_id_dominio bigint,
+  foreign key (fk_id_dominio) references dominio (id)
+);
+
 create table chamado(
   id bigint not null primary key auto_increment,
   de varchar(15) not null,
@@ -52,6 +60,17 @@ create table chamado(
   foreign key (fk_id_usuario) references usuario (id),
   foreign key (fk_id_dominio) references dominio (id),
   foreign key (fk_fechado_por) references usuario (id)
+);
+
+create table integracao(
+  id bigint not null primary key auto_increment,
+  fk_id_usuario bigint not null,
+  fk_id_dominio bigint not null,
+  id_ticket bigint not null default 0,
+  callid varchar(255) not null,
+  gravacao_enviada tinyint not null default 0,
+  foreign key (fk_id_usuario) references usuario (id),
+  foreign key (fk_id_dominio) references dominio (id)
 );
 
 insert into dominio (dominio) values ('cloud.cloudcom.com.br');

@@ -1,189 +1,96 @@
-const express = require("express");
-const app = express.Router();
-const axios = require("axios");
-const querystring = require("querystring");
-
-const api = axios.create({
-  baseURL: "https://api.netoffice.com.br/v1/"
-});
+const express = require('express')
+const app = express.Router()
+const { getClienteId, addTicket, addTicketWClient } = require('../service/api-dendron')
+const { getDendronParams } = require('../model/usuario')
+const { abrirChamado, fecharChamado, obterDetalhesLigacao, obterHistorico } = require('../model/chamado')
+const { obterContato } = require('../model/agenda')
+const { addGravacaoEmEspera } = require('../model/integracao')
 
 const init = (connection, io) => {
-  app.get("/:from/:to/:user/:domain/:callid/:event", async (req, res) => {
-    const parametros = req.params;
+  app.get('/:from/:to/:user/:domain/:callid/:event', async (req, res) => {
+    res.send()
+    const parametros = req.params
+    const { from, to, user, domain, callid, event } = req.params
 
-    if (parametros.event === "RINGING") {
-      res.send();
-      let [[descricoes]] = await connection.query(
-        `
-      select
-        (select descricao from agenda, dominio where did = ? and agenda.fk_id_dominio = dominio.id and dominio.dominio = ?) as desc_from,
-        (select agenda.id from agenda, dominio where did = ? and agenda.fk_id_dominio = dominio.id and dominio.dominio = ?) as id_from,
-        (select descricao from agenda, dominio where did = ? and agenda.fk_id_dominio = dominio.id and dominio.dominio = ?) as desc_to,
-        (select fraseologia from agenda, dominio where did = ? and agenda.fk_id_dominio = dominio.id and dominio.dominio = ?) as script,
-        (SELECT usuario.id FROM dominio, usuario WHERE usuario.fk_id_dominio = dominio.id AND dominio.dominio = ? AND usuario.user_basix = ?) AS id_usuario,
-        (SELECT dominio.id FROM dominio, usuario WHERE usuario.fk_id_dominio = dominio.id AND dominio.dominio = ? AND usuario.user_basix = ?) AS id_dominio
-      `,
-        [
-          parametros.from,
-          parametros.domain,
-          parametros.from,
-          parametros.domain,
-          parametros.to,
-          parametros.domain,
-          parametros.to,
-          parametros.domain,
-          parametros.domain,
-          parametros.user,
-          parametros.domain,
-          parametros.user
-        ]
-      );
+    if (event === 'RINGING' || event === 'ESTABLISHED') {
+      let descricoes = await obterDetalhesLigacao(from, to, user, domain, connection)
 
-      parametros.fromComment = descricoes.desc_from ? descricoes.desc_from : "";
-      parametros.toComment = descricoes.desc_to ? descricoes.desc_to : "";
-      parametros.script = descricoes.script ? descricoes.script : "";
-      parametros.id_from = descricoes.id_from ? descricoes.id_from : "";
+      let { idUser, idDominio, token, operador } = await getDendronParams(user, domain, connection)
+      if (token) {
+        let clienteId = await getClienteId(token, from)
 
-      const [detalhes] = await connection.query(
-        `
-        SELECT
-          *
-        FROM
-          campos_agenda
-        WHERE
-          fk_id_agenda = ?`,
-        [descricoes.id_from]
-      );
+        if (clienteId) {
+          let { id_ticket } = await addTicket(token, operador, 'Telefonia', '', clienteId, from)
 
-      parametros.detalhes = detalhes;
+          addGravacaoEmEspera(idUser, idDominio, id_ticket, callid, connection)
+        } else {
+          let { id_ticket } = await addTicketWClient(token, operador, 'Telefonia', '', from)
 
-      let [historico] = await connection.query(
-        `
-      SELECT
-        chamado.id,
-        comentario,
-        inicio,
-        replace(replace(aberto, 1, 'Aberto'), 0, 'Fechado') as status,
-        usuario.nome
-      FROM
-        chamado,
-        usuario
-      WHERE
-        chamado.fk_id_usuario = usuario.id and
-        chamado.fk_id_dominio = ? and
-        de = ?
-      ORDER BY
-        inicio DESC
-      limit 10
-      `,
-        [descricoes.id_dominio, parametros.from]
-      );
+          addGravacaoEmEspera(idUser, idDominio, id_ticket, callid, connection)
+        }
 
-      historico = historico.map(item => {
-        item.inicio = item.inicio = `${item.inicio.getDate()}/${(item.inicio.getMonth() + 1)
-          .toString()
-          .padStart(2, "0")}/${item.inicio.getFullYear()} ${item.inicio
-          .getHours()
-          .toString()
-          .padStart(2, "0")}:${item.inicio
-          .getMinutes()
-          .toString()
-          .padStart(2, "0")}:${item.inicio
-          .getSeconds()
-          .toString()
-          .padStart(2, "0")}`;
+        return
+      }
 
-        return item;
-      });
+      parametros.fromComment = descricoes.desc_from ? descricoes.desc_from : ''
+      parametros.toComment = descricoes.desc_to ? descricoes.desc_to : ''
+      parametros.script = descricoes.script ? descricoes.script : ''
+      parametros.id_from = descricoes.id_from ? descricoes.id_from : ''
 
-      parametros.historico = historico;
+      parametros.detalhes = await obterContato(descricoes.id_from, connection)
+
+      parametros.historico = await obterHistorico(descricoes.id_dominio, from, connection)
 
       if (Number.isInteger(descricoes.id_usuario) && Number.isInteger(descricoes.id_dominio)) {
-        let [chamado] = await connection.query(
-          "INSERT INTO chamado (de, para, call_id, fk_id_usuario, fk_id_dominio) VALUES (?, ?, ?, ?, ?)",
-          [parametros.from, parametros.to, parametros.callid, descricoes.id_usuario, descricoes.id_dominio]
-        );
-        parametros.id = chamado.insertId;
+        parametros.id = await abrirChamado(from, to, callid, descricoes.id_usuario, descricoes.id_dominio, connection)
 
-        io.emit(`${parametros.domain}-${parametros.user}`, parametros);
+        io.emit(`${parametros.domain}-${parametros.user}`, parametros)
       }
-
-      return;
     }
-    if (parametros.event === "DISCONNECTED") {
-      res.send();
-      connection.query("UPDATE chamado SET termino = now() WHERE call_id = ?", [parametros.callid]);
-      return;
+
+    if (event === 'DISCONNECTED') {
+      fecharChamado(callid, connection)
+      return
     }
-    res.send();
-  });
+    return
+  })
 
-  app.get("/:from/:to/:user/:domain/:callid/:event/:history", async (req, res) => {
-    res.send();
+  app.get('/:from/:to/:user/:domain/:callid/:event/:history', async (req, res) => {
+    res.send()
 
-    let { from, history, user, domain } = req.params;
+    let { from, history, user, domain, callid } = req.params
 
-    let [[retorno]] = await connection.query(
-      "SELECT dendron_operador, dendron_token FROM usuario WHERE user_basix = ? and fk_id_dominio = (SELECT id FROM dominio WHERE dominio = ?)",
-      [user, domain]
-    );
+    let { idUser, idDominio, token, operador } = await getDendronParams(user, domain, connection)
 
-    let response = await api.get("/GetClientes", { headers: { token: retorno.dendron_token } });
-
-    let clienteId = response.data.reduce((retorno, item) => {
-      if (item.telefone1) {
-        if (item.telefone1.replace(/\(|\)| |-/g, "") === from) {
-          retorno = item.id;
-        }
-      }
-      if (item.telefone2) {
-        if (item.telefone2.replace(/\(|\)| |-/g, "") === from) {
-          retorno = item.id;
-        }
-      }
-
-      return retorno;
-    });
+    let clienteId = await getClienteId(token, from)
 
     if (clienteId) {
-      response = await api.post(
-        "/AddTicket",
-        querystring.stringify({
-          usuario: "api",
-          operador: retorno.dendron_operador,
-          tags: "telefonia",
-          assunto: history.split(".")[history.split(".").length - 1],
-          descricao: history.split(".").join(" -> "),
-          cliente_id: clienteId
-        }),
-        {
-          headers: {
-            token: retorno.dendron_token,
-            "Content-Type": "application/x-www-form-urlencoded"
-          }
-        }
-      );
+      let { id_ticket } = await addTicket(
+        token,
+        operador,
+        history.split('.')[history.split('.').length - 1],
+        history.split('.').join(' -> '),
+        clienteId,
+        from
+      )
+
+      addGravacaoEmEspera(idUser, idDominio, id_ticket, callid, connection)
     } else {
-      response = await api.post(
-        "/AddTicket",
-        querystring.stringify({
-          usuario: "api",
-          operador: retorno.dendron_operador,
-          tags: "telefonia",
-          assunto: history.split(".")[history.split(".").length - 1],
-          descricao: history.split(".").join(" -> ")
-        }),
-        {
-          headers: {
-            token: retorno.dendron_token,
-            "Content-Type": "application/x-www-form-urlencoded"
-          }
-        }
-      );
+      let { id_ticket } = await addTicketWClient(
+        token,
+        operador,
+        history.split('.')[history.split('.').length - 1],
+        history.split('.').join(' -> '),
+        from
+      )
+
+      addGravacaoEmEspera(idUser, idDominio, id_ticket, callid, connection)
     }
-  });
 
-  return app;
-};
+    return
+  })
 
-module.exports = init;
+  return app
+}
+
+module.exports = init

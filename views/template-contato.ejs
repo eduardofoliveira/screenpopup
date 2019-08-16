@@ -1,0 +1,112 @@
+<% include elements/header %>
+<% include elements/menu %>
+
+<div class="ui purple segment list-users">
+  <p>Template para adição de contatos</p>
+
+  <div class="ui inverted segment">
+    <form class="ui inverted form" method="post">
+      <div class="ui inverted segment">
+        <% if(campos){ %>
+          <div class="custom-fields">
+          <% campos.map((item, index) => { %>
+            <% if (index !== 0 && index % 4 === 0) { %>
+              </div>
+            <% } %>
+
+            <% if (index % 4 === 0) { %>
+              <div class="four fields">
+            <% } %>
+
+            <div class="field">
+              <label><%= item %></label>
+              <div class="ui action input">
+                <input placeholder="<%= item %>" type="text" name="<%= item %>" value="" />
+                <button type="button" class="ui button delete-btn">Delete</button>
+              </div>
+            </div>
+
+            <% if (index !== 0 && index === campos.length - 1) { %>
+              </div>
+            <% } %>
+          <% }) %>
+          </div>
+        <% }else{ %>
+        <div class="custom-fields">Nenhum campo configurado</div>
+        <% } %>
+      </div>
+
+      <div class="fields">
+        <div class="field">
+          <div class="ui buttons">
+            <button type="button" class="ui button" onclick="addField()">Adicionar campo</button>
+          </div>
+        </div>
+      </div>
+
+      <button class="ui inverted green button" type="submit">Alterar</button>
+    </form>
+  </div>
+</div>
+<script>
+  async function addField(evt) {
+    const { value: campo } = await Swal.fire({
+      title: 'Insira o nome para o campo',
+      input: 'text',
+      inputPlaceholder: 'Nome do campo'
+    })
+
+    if (campo && /^[a-z0-9]*$/.test(campo)) {
+      $('.custom-fields').append(`
+        <div class="four fields">
+          <div class="field">
+            <label>${campo}</label>
+            <div class="ui action input">
+              <input placeholder="${campo}" type="text" name="${campo}" value="" />
+              <button type="button" class="ui button delete-btn">Delete</button>
+            </div>
+          </div>
+        </div>
+      `)
+
+      ativarButaoDelete()
+    } else if (!campo) {
+    } else {
+      Swal.fire({
+        type: 'error',
+        title: 'Erro no nome do campo',
+        text: 'Aceito somente letras minusculas e numeros sem espaços!'
+      })
+    }
+  }
+
+  let ativarButaoDelete = () => {
+    $('.delete-btn').click(function(event) {
+      let elementoCampo = $(this).parents('.field')
+      let elementoLabel = $(this)
+        .parents('.field')
+        .find('label')
+        .html()
+      let id = $(this).attr('data-id')
+
+      Swal.fire({
+        title: 'Confirmar ?',
+        text: `Tem certeza que deseja apagar o campo ${elementoLabel}`,
+        type: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Remover',
+        cancelButtonText: 'Cancelar'
+      }).then(async result => {
+        if (result.value) {
+          elementoCampo.remove()
+          Swal.fire('Deletado !', 'Campo removido.', 'success')
+        }
+      })
+    })
+  }
+  ativarButaoDelete()
+</script>
+
+<% include elements/footer %>

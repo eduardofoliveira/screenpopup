@@ -16,7 +16,11 @@
       <div class="four fields">
         <div class="field">
           <label>Originador</label>
-          <div class="ui black message"><a href="/contatos/editar/${chamado.from_id}">${chamado.de}</a></div>
+          `%><% if(chamado.from_id){ %><%- `
+            <div class="ui black message"><a href="/contatos/editar/${chamado.from_id}">${chamado.de}</a></div>
+            `%><% }else{ %><%- `
+            <div class="ui black message">${chamado.de}</div>
+            `%><% } %><%- `
         </div>
 
         <div class="field">
@@ -178,9 +182,14 @@
           <div class="ui form">
           <div class="four fields">
             <div class="field">
-              <label>Originador</label>
-              <div class="ui black message"><a href="/contatos/editar/${info.id_from}">${info.from}</a></div>
-            </div>
+              <label>Originador</label>`
+              if(info.id_from){
+                injectHtml += `<div class="ui black message"><a href="/contatos/editar/${info.id_from}">${info.from}</a></div>`
+              }else{
+                injectHtml += `<div class="ui black message">${info.from}</div>`
+              }
+              
+              injectHtml += `</div>
 
             <div class="field">
               <label>Descrição</label>

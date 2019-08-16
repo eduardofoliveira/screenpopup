@@ -1,18 +1,17 @@
-const express = require("express");
-const bcrypt = require("bcryptjs");
-const app = express.Router();
+const express = require('express')
+const bcrypt = require('bcryptjs')
+const app = express.Router()
 
 const init = connection => {
-  app.get("/", (req, res) => {
-    res.render("login", { error: null });
-  });
+  app.get('/', (req, res) => {
+    res.render('login', { error: null })
+  })
 
-  app.post("/", async (req, res) => {
-    let { email, senha } = req.body;
+  app.post('/', async (req, res) => {
+    let { email, senha } = req.body
 
     if (!email || !senha) {
-      res.render("login", { error: true });
-      return;
+      return res.render('login', { error: true })
     }
 
     //Gerar com peso 12
@@ -21,31 +20,30 @@ const init = connection => {
 
     //const [user] = await connection.query('select usuario.id, nome, email, senha, dominio, fk_id_dominio from usuario, dominio where usuario.fk_id_dominio = dominio.id and email = ? and ativo = 1', [email])
     const [user] = await connection.query(
-      "select usuario.*, dominio from usuario left join dominio on usuario.fk_id_dominio = dominio.id where email = ? and ativo = 1",
+      'select usuario.*, dominio from usuario left join dominio on usuario.fk_id_dominio = dominio.id where email = ? and ativo = 1',
       [email]
-    );
+    )
 
     if (user.length < 1) {
-      res.render("login", { error: true });
-      return;
+      return res.render('login', { error: true })
     }
 
     if (await bcrypt.compare(senha, user[0].senha)) {
-      delete user[0].senha;
-      req.session.user = user[0];
-      res.redirect("/");
+      delete user[0].senha
+      req.session.user = user[0]
+      return res.redirect('/')
     } else {
-      res.render("login", { error: true });
+      return res.render('login', { error: true })
     }
-  });
+  })
 
-  app.get("/logoff", (req, res) => {
+  app.get('/logoff', (req, res) => {
     req.session.destroy(() => {
-      res.redirect("/login");
-    });
-  });
+      return res.redirect('/login')
+    })
+  })
 
-  return app;
-};
+  return app
+}
 
-module.exports = init;
+module.exports = init
