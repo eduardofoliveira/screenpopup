@@ -15,6 +15,7 @@ create table usuario(
   loginlogout tinyint not null default 2,
   gravacao tinyint not null default 1,
   descricao text,
+  ativo_dendron tinyint not null default 0,
   dendron_operador varchar(255),
   dendron_token varchar(255),
   foreign key (fk_id_dominio) references dominio (id)
