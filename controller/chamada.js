@@ -4,20 +4,33 @@ const { getClienteId, addTicket, addTicketWClient } = require('../service/api-de
 const { getDendronParams } = require('../model/usuario')
 const { abrirChamado, fecharChamado, obterDetalhesLigacao, obterHistorico } = require('../model/chamado')
 const { obterContato } = require('../model/agenda')
+const { addGravacaoEmEspera } = require('../model/integracao')
 
 const init = (connection, io) => {
   app.get('/:from/:to/:user/:domain/:callid/:event', async (req, res) => {
     res.send()
     const parametros = req.params
+    const { from, to, user, domain, callid, event } = req.params
 
-    if (parametros.event === 'RINGING' || parametros.event === 'ESTABLISHED') {
-      let descricoes = await obterDetalhesLigacao(
-        parametros.from,
-        parametros.to,
-        parametros.user,
-        parametros.domain,
-        connection
-      )
+    if (event === 'RINGING' || event === 'ESTABLISHED') {
+      let descricoes = await obterDetalhesLigacao(from, to, user, domain, connection)
+
+      let { idUser, idDominio, token, operador } = await getDendronParams(user, domain, connection)
+      if (token) {
+        let clienteId = await getClienteId(token, from)
+
+        if (clienteId) {
+          let { id_ticket } = await addTicket(token, operador, 'Telefonia', '', clienteId, from)
+
+          addGravacaoEmEspera(idUser, idDominio, id_ticket, callid, connection)
+        } else {
+          let { id_ticket } = await addTicketWClient(token, operador, 'Telefonia', '', from)
+
+          addGravacaoEmEspera(idUser, idDominio, id_ticket, callid, connection)
+        }
+
+        return
+      }
 
       parametros.fromComment = descricoes.desc_from ? descricoes.desc_from : ''
       parametros.toComment = descricoes.desc_to ? descricoes.desc_to : ''
@@ -26,24 +39,17 @@ const init = (connection, io) => {
 
       parametros.detalhes = await obterContato(descricoes.id_from, connection)
 
-      parametros.historico = await obterHistorico(descricoes.id_dominio, parametros.from, connection)
+      parametros.historico = await obterHistorico(descricoes.id_dominio, from, connection)
 
       if (Number.isInteger(descricoes.id_usuario) && Number.isInteger(descricoes.id_dominio)) {
-        parametros.id = await abrirChamado(
-          parametros.from,
-          parametros.to,
-          parametros.callid,
-          descricoes.id_usuario,
-          descricoes.id_dominio,
-          connection
-        )
+        parametros.id = await abrirChamado(from, to, callid, descricoes.id_usuario, descricoes.id_dominio, connection)
 
         io.emit(`${parametros.domain}-${parametros.user}`, parametros)
       }
     }
 
-    if (parametros.event === 'DISCONNECTED') {
-      fecharChamado(parametros.callid, connection)
+    if (event === 'DISCONNECTED') {
+      fecharChamado(callid, connection)
       return
     }
     return
@@ -52,14 +58,14 @@ const init = (connection, io) => {
   app.get('/:from/:to/:user/:domain/:callid/:event/:history', async (req, res) => {
     res.send()
 
-    let { from, history, user, domain } = req.params
+    let { from, history, user, domain, callid } = req.params
 
-    let { token, operador } = await getDendronParams(user, domain, connection)
+    let { idUser, idDominio, token, operador } = await getDendronParams(user, domain, connection)
 
     let clienteId = await getClienteId(token, from)
 
     if (clienteId) {
-      await addTicket(
+      let { id_ticket } = await addTicket(
         token,
         operador,
         history.split('.')[history.split('.').length - 1],
@@ -67,19 +73,19 @@ const init = (connection, io) => {
         clienteId,
         from
       )
+
+      addGravacaoEmEspera(idUser, idDominio, id_ticket, callid, connection)
     } else {
-      await addTicketWClient(
+      let { id_ticket } = await addTicketWClient(
         token,
         operador,
         history.split('.')[history.split('.').length - 1],
         history.split('.').join(' -> '),
         from
       )
-    }
 
-    /**
-     * Salvar o ID do Ticket para posteriormente fazer o upload da gravação
-     */
+      addGravacaoEmEspera(idUser, idDominio, id_ticket, callid, connection)
+    }
 
     return
   })

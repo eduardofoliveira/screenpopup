@@ -59,4 +59,7 @@ const init = async () => {
 
 init()
 
-// Atualizado
+/**
+ * Iniciar serviço que verifica se a gravação da Dendron esta pronta
+ * e anexo no chamado...
+ */

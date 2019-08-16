@@ -41,7 +41,7 @@ let getClienteId = (token, fone) => {
 let addTicket = (token, operador, assunto, descricao, clientId, from) => {
   return new Promise(async (resolve, reject) => {
     try {
-      await api.post(
+      let response = await api.post(
         '/AddTicket',
         querystring.stringify({
           usuario: 'api',
@@ -59,7 +59,7 @@ let addTicket = (token, operador, assunto, descricao, clientId, from) => {
         }
       )
 
-      resolve()
+      resolve(response.data)
     } catch (error) {
       reject(error)
     }
@@ -69,7 +69,7 @@ let addTicket = (token, operador, assunto, descricao, clientId, from) => {
 let addTicketWClient = (token, operador, assunto, descricao, from) => {
   return new Promise(async (resolve, reject) => {
     try {
-      await api.post(
+      let response = await api.post(
         '/AddTicket',
         querystring.stringify({
           usuario: 'api',
@@ -86,7 +86,7 @@ let addTicketWClient = (token, operador, assunto, descricao, from) => {
         }
       )
 
-      resolve()
+      resolve(response.data)
     } catch (error) {
       reject(error)
     }
