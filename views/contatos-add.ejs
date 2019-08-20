@@ -18,7 +18,32 @@
         </div>
       </div>
 
-      <div class="custom-fields"></div>
+      <div class="custom-fields">
+        <% if(custom){ %>
+          <% custom.map((item, index) => { %>
+            <% if (index !== 0 && index % 4 === 0) { %>
+              </div>
+            <% } %>
+
+            <% if (index % 4 === 0) { %>
+              <div class="four fields">
+            <% } %>
+
+            <div class="field">
+              <label><%= item %></label>
+              <div class="ui action input">
+                <input placeholder="<%=item %>" type="text" name="<%= item %>" value="" />
+                <button type="button" class="ui button delete-btn">Delete</button>
+              </div>
+            </div>
+
+
+            <% if (index !== 0 && index === custom.length - 1) { %>
+              </div>
+            <% } %>
+          <% }) %>
+        <% } %>
+      </div>
 
       <div class="fields">
         <div class="field">
