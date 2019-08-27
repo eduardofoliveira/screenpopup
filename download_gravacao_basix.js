@@ -20,11 +20,16 @@ let executar = async () => {
   `)
 
   for (let i = 0; i < calls.length; i++) {
-    let call = calls[i]
-    let link = await get_link_from_basix(call.callid)
-    await get_gravacao(link, call.callid)
-    await upload_to_ticket(call.dendron_operador, 'Gravação da Chamada', call.id_ticket, `${call.callid}.mp3`)
-    await conn.query('UPDATE integracao SET gravacao_enviada = 1 WHERE callid = ?', [call.callid])
+    try {
+      let call = calls[i]
+      let link = await get_link_from_basix(call.callid)
+      await get_gravacao(link, call.callid)
+      await upload_to_ticket(call.dendron_operador, 'Gravação da Chamada', call.id_ticket, `${call.callid}.mp3`)
+      await conn.query('UPDATE integracao SET gravacao_enviada = 1 WHERE callid = ?', [call.callid])
+    } catch (error) {
+      console.log(call)
+      console.log(error)
+    }
   }
 
   process.exit(0)
