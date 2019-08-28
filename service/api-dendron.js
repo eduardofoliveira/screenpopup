@@ -1,5 +1,7 @@
 const querystring = require('querystring')
 const axios = require('axios')
+const fs = require('fs')
+const FormData = require('form-data')
 
 const api = axios.create({
   baseURL: 'https://api.netoffice.com.br/v1/'
@@ -93,8 +95,35 @@ let addTicketWClient = (token, operador, assunto, descricao, from) => {
   })
 }
 
+let upload_to_ticket = async (usuario, comentario, id_ticket, nome_arquivo) => {
+  return new Promise((resolve, reject) => {
+    try {
+      const arquivo = fs.createReadStream(`./${nome_arquivo}`)
+
+      const form = new FormData()
+      form.append('usuario', usuario)
+      form.append('comentario', comentario)
+      form.append('id', id_ticket)
+      form.append('arquivo', arquivo)
+
+      api({
+        method: 'POST',
+        url: '/TicketInteracao',
+        data: form,
+        headers: { ...form.getHeaders(), ...{ token: 'Aa342de6b4545610SN38d54107fsdA28c8b4d1AZ3' } }
+      }).then(result => {
+        resolve(result.data)
+        fs.unlinkSync(`./${nome_arquivo}`)
+      })
+    } catch (error) {
+      reject(error)
+    }
+  })
+}
+
 module.exports = {
   addTicketWClient,
   getClienteId,
-  addTicket
+  addTicket,
+  upload_to_ticket
 }

@@ -69,6 +69,8 @@ create table integracao(
   id_ticket bigint not null default 0,
   callid varchar(255) not null,
   gravacao_enviada tinyint not null default 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT '0000-00-00 00:00:00' ON UPDATE CURRENT_TIMESTAMP,
   foreign key (fk_id_usuario) references usuario (id),
   foreign key (fk_id_dominio) references dominio (id)
 );
