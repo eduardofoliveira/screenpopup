@@ -27,8 +27,19 @@ let executar = async () => {
       await upload_to_ticket(call.dendron_operador, 'Gravação da Chamada', call.id_ticket, `${call.callid}.mp3`)
       await conn.query('UPDATE integracao SET gravacao_enviada = 1 WHERE callid = ?', [call.callid])
     } catch (error) {
-      console.log(call)
-      console.log(error)
+      if (error.response) {
+        let { status, statusText } = error.response
+        let call = calls[i]
+
+        if (status === 404) {
+          console.log(`Gravação não encontrada ${status} ${statusText} ${call.callid}`)
+          await conn.query('UPDATE integracao SET gravacao_enviada = 2 WHERE callid = ?', [call.callid])
+        } else {
+          console.log(`Erro: ${status} ${statusText} ${call.callid}`)
+        }
+      } else {
+        console.log(error)
+      }
     }
   }
 
