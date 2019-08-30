@@ -18,6 +18,10 @@ create table usuario(
   ativo_dendron tinyint not null default 0,
   dendron_operador varchar(255),
   dendron_token varchar(255),
+  ativo_zendesk tinyint not null default 0,
+  email_zendesk varchar(255),
+  token_zendesk varchar(255),
+  sub_dominio_zendesk varchar(255),
   foreign key (fk_id_dominio) references dominio (id)
 );
 
