@@ -76,7 +76,7 @@ const middleware = async (req, res, next) => {
     let { email, token, sub_dominio } = await getZendeskParams(user, domain, conn)
 
     console.log(email, token, sub_dominio)
-    await addZenTicket(sub_dominio, email, token, from, to)
+    await addZenTicket(sub_dominio, email, token, from, to, user)
 
     return res.json({ ok: '200' })
   }

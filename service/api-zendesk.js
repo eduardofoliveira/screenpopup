@@ -3,7 +3,7 @@ const axios = require('axios')
 const fs = require('fs')
 const FormData = require('form-data')
 
-const addZenTicket = (sub_dominio, email, token, from, to) => {
+const addZenTicket = (sub_dominio, email, token, from, to, basix_user) => {
   return new Promise(async (resolve, reject) => {
     try {
       const api = axios.create({
@@ -15,25 +15,46 @@ const addZenTicket = (sub_dominio, email, token, from, to) => {
         headers: { 'Content-Type': 'application/json' }
       })
 
-      // Buscar user pelo numero do telefone e vincular ao Ticket se existir.
+      let { data } = await api.get(`/users/search.json?query=${from}`)
+      if (data.users.length > 0) {
+        requester_id = data.users[0].id
 
-      await api.post('/tickets.json', {
-        ticket: {
-          subject: `Chamada recebida de ${from} para ${to}`,
-          comment: {
-            body: 'Body da Requisição'
-          },
-          priority: 'urgent',
-          requester: {
-            locale_id: 19,
-            name: from,
-            phone: from,
-            time_zone: 'Brasilia',
-            iana_time_zone: 'America/Sao_Paulo'
-          },
-          tags: ['telefonia', 'Basix']
-        }
-      })
+        await api.post('/tickets.json', {
+          ticket: {
+            subject: `Chamada recebida de ${from}`,
+            comment: {
+              body: `Chamada Recebida:
+De: ${from}
+Para: ${to}
+Usuário: ${basix_user}`
+            },
+            priority: 'urgent',
+            requester_id,
+            tags: ['telefonia', 'Basix']
+          }
+        })
+      } else {
+        await api.post('/tickets.json', {
+          ticket: {
+            subject: `Chamada recebida de ${from}`,
+            comment: {
+              body: `Chamada Recebida:
+De: ${from}
+Para: ${to}
+Usuário: ${basix_user}`
+            },
+            priority: 'urgent',
+            requester: {
+              locale_id: 19,
+              name: from,
+              phone: from,
+              time_zone: 'Brasilia',
+              iana_time_zone: 'America/Sao_Paulo'
+            },
+            tags: ['telefonia', 'Basix']
+          }
+        })
+      }
 
       resolve()
     } catch (error) {
