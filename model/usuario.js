@@ -18,6 +18,39 @@ let getDendronParams = (user, idDomain, connection) => {
   })
 }
 
+let getZendeskParams = (user, domain, connection) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let [[retorno]] = await connection.query(
+        `
+          SELECT
+            u.email_zendesk,
+            u.token_zendesk,
+            u.sub_dominio_zendesk
+          FROM
+            usuario u,
+            dominio d
+          WHERE
+            u.fk_id_dominio = d.id and
+            u.user_basix = ? and
+            d.dominio = ? and
+            ativo = 1
+      `,
+        [user, domain]
+      )
+
+      resolve({
+        email: retorno.email_zendesk,
+        token: retorno.token_zendesk,
+        sub_dominio: retorno.sub_dominio_zendesk
+      })
+    } catch (error) {
+      reject(error)
+    }
+  })
+}
+
 module.exports = {
-  getDendronParams
+  getDendronParams,
+  getZendeskParams
 }
