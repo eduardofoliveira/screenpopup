@@ -99,7 +99,7 @@ const middleware = async (req, res, next) => {
     console.log(req.params);
     console.log(error);
 
-    return res.json({ error: "Requisição não concluida" });
+    return res.status(400).json({ error: "Requisição não concluida" });
   }
 };
 
