@@ -79,14 +79,14 @@ const middleware = async (req, res, next) => {
     if (ativo_zendesk) {
       let { email, token, sub_dominio } = await getZendeskParams(user, domain, conn);
 
-      if(to.indexOf('Invasao') === 0){
-        to = to.replace('Invasao', '')
+      if(from.indexOf('Invasao') === 0){
+        from = from.replace('Invasao', '')
         await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360002790814);
         return res.json({ ok: "200" });
       }
 
-      if(to.indexOf('Cruzeiro') === 0){
-        to = to.replace('Cruzeiro', '')
+      if(from.indexOf('Cruzeiro') === 0){
+        from = from.replace('Cruzeiro', '')
         await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360002789753);
         return res.json({ ok: "200" });
       }
