@@ -5,7 +5,7 @@ const { addZenTicket, addZenTicketCanal } = require("../service/api-zendesk");
 
 const middleware = async (req, res, next) => {
   try {
-    const { from, to, user, domain, callid, event, history } = req.params;
+    let { from, to, user, domain, callid, event, history } = req.params;
 
     if (!(event === "RINGING" || event === "ESTABLISHED")) {
       return next();
@@ -78,6 +78,18 @@ const middleware = async (req, res, next) => {
 
     if (ativo_zendesk) {
       let { email, token, sub_dominio } = await getZendeskParams(user, domain, conn);
+
+      if(to.indexOf('Invasao') === 0){
+        to = to.replace('Invasao', '')
+        await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360002790814);
+        return res.json({ ok: "200" });
+      }
+
+      if(to.indexOf('Cruzeiro') === 0){
+        to = to.replace('Cruzeiro', '')
+        await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360002789753);
+        return res.json({ ok: "200" });
+      }
 
       if (history.indexOf("Cruzeiro_Esporte_Tour") > -1 || history.indexOf("Invasao_Corinthiana") > -1) {
         if (history.indexOf("Cruzeiro_Esporte_Tour") > -1) {
