@@ -97,7 +97,13 @@ const middleware = async (req, res, next) => {
         return res.json({ ok: "200" });
       }
 
-      if (history.indexOf("Cruzeiro_Esporte_Tour") > -1 || history.indexOf("Invasao_Corinthiana") > -1 || history.indexOf("Destino_Colorado") > -1) {
+      if(from.indexOf('VouVerOFlu') === 0){
+        from = from.replace('VouVerOFlu', '')
+        await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360002789773);
+        return res.json({ ok: "200" });
+      }
+
+      if (history.indexOf("Cruzeiro_Esporte_Tour") > -1 || history.indexOf("Invasao_Corinthiana") > -1 || history.indexOf("Destino_Colorado") > -1 || history.indexOf("VouVerOFlu") > -1) {
         if (history.indexOf("Cruzeiro_Esporte_Tour") > -1) {
           await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360002789753);
         }
@@ -106,6 +112,9 @@ const middleware = async (req, res, next) => {
         }
         if (history.indexOf("Destino_Colorado") > -1) {
           await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360003537214);
+        }
+        if (history.indexOf("VouVerOFlu") > -1) {
+          await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360002789773);
         }
 
         return res.json({ ok: "200" });
