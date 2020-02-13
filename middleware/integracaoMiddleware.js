@@ -91,12 +91,21 @@ const middleware = async (req, res, next) => {
         return res.json({ ok: "200" });
       }
 
-      if (history.indexOf("Cruzeiro_Esporte_Tour") > -1 || history.indexOf("Invasao_Corinthiana") > -1) {
+      if(from.indexOf('Colorado') === 0){
+        from = from.replace('Colorado', '')
+        await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360003537214);
+        return res.json({ ok: "200" });
+      }
+
+      if (history.indexOf("Cruzeiro_Esporte_Tour") > -1 || history.indexOf("Invasao_Corinthiana") > -1 || history.indexOf("Destino_Colorado") > -1) {
         if (history.indexOf("Cruzeiro_Esporte_Tour") > -1) {
           await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360002789753);
         }
         if (history.indexOf("Invasao_Corinthiana") > -1) {
           await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360002790814);
+        }
+        if (history.indexOf("Destino_Colorado") > -1) {
+          await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360003537214);
         }
 
         return res.json({ ok: "200" });
