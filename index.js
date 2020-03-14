@@ -6,7 +6,7 @@ const expressValidator = require('express-validator')
 const app = express()
 const http = require('http').Server(app)
 const io = require('socket.io')(http)
-io.origins(['http://contact.cloudcom.com.br']);
+// io.origins(['http://contact.cloudcom.com.br']);
 const port = process.env.PORT || 80
 
 const init = async () => {
