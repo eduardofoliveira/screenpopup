@@ -6,7 +6,7 @@ const cors = require('cors')
 const expressValidator = require('express-validator')
 const app = express()
 const http = require('http').Server(app)
-const io = require('socket.io')(http)
+const io = require('socket.io')(http, { origins: '*:*'})
 // io.origins(['http://contact.cloudcom.com.br']);
 const port = process.env.PORT || 80
 
