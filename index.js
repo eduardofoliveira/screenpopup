@@ -12,7 +12,7 @@ const init = async () => {
   try {
     const connection = await require('./service/mysql')
 
-    io.origins(['*']);
+    io.origins(['http://contact.cloudcom.com.br']);
     app.set('view engine', 'ejs')
     app.use(bodyParser.urlencoded({ extended: true }))
     app.use(bodyParser.json())
