@@ -6,13 +6,13 @@ const expressValidator = require('express-validator')
 const app = express()
 const http = require('http').Server(app)
 const io = require('socket.io')(http)
+io.origins(['http://contact.cloudcom.com.br']);
 const port = process.env.PORT || 80
 
 const init = async () => {
   try {
     const connection = await require('./service/mysql')
 
-    io.origins(['http://contact.cloudcom.com.br']);
     app.set('view engine', 'ejs')
     app.use(bodyParser.urlencoded({ extended: true }))
     app.use(bodyParser.json())
