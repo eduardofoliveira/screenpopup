@@ -122,26 +122,28 @@ const middleware = async (req, res, next) => {
         return res.json({ ok: "200" })
       }
 
-      if (
-        (history !== undefined && history.indexOf("Cruzeiro_Esporte_Tour") > -1) ||
-        history.indexOf("Invasao_Corinthiana") > -1 ||
-        history.indexOf("Destino_Colorado") > -1 ||
-        history.indexOf("VouVerOFlu") > -1
-      ) {
-        if (history.indexOf("Cruzeiro_Esporte_Tour") > -1) {
-          await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360002789753)
-        }
-        if (history.indexOf("Invasao_Corinthiana") > -1) {
-          await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360002790814)
-        }
-        if (history.indexOf("Destino_Colorado") > -1) {
-          await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360003537214)
-        }
-        if (history.indexOf("VouVerOFlu") > -1) {
-          await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360002789773)
-        }
+      if (history) {
+        if (
+          history.indexOf("Cruzeiro_Esporte_Tour") > -1 ||
+          history.indexOf("Invasao_Corinthiana") > -1 ||
+          history.indexOf("Destino_Colorado") > -1 ||
+          history.indexOf("VouVerOFlu") > -1
+        ) {
+          if (history.indexOf("Cruzeiro_Esporte_Tour") > -1) {
+            await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360002789753)
+          }
+          if (history.indexOf("Invasao_Corinthiana") > -1) {
+            await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360002790814)
+          }
+          if (history.indexOf("Destino_Colorado") > -1) {
+            await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360003537214)
+          }
+          if (history.indexOf("VouVerOFlu") > -1) {
+            await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360002789773)
+          }
 
-        return res.json({ ok: "200" })
+          return res.json({ ok: "200" })
+        }
       }
 
       await addZenTicket(sub_dominio, email, token, from, to, user)
