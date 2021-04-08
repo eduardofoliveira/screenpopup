@@ -13,7 +13,9 @@ const addZenTicketCanal = async (sub_dominio, email, token, from, to, basix_user
           password: token,
         },
         headers: { "Content-Type": "application/json" },
-        rejectUnauthorized: false,
+        httpsAgent: new https.Agent({
+          rejectUnauthorized: false,
+        }),
       })
 
       let { data } = await api.get(`/users/search.json?query=${from}`)
