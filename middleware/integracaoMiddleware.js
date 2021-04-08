@@ -13,24 +13,24 @@ const middleware = async (req, res, next) => {
 
     let { conn } = req
 
-    let [result] = await conn.query(
-      `
-    SELECT
-      ativo_dendron,
-      ativo_zendesk
-    FROM
-      usuario u,
-      dominio d
-    WHERE
-      u.fk_id_dominio = d.id and
-      u.user_basix = ? and
-      d.dominio = ? and
-      u.ativo = 1
-    `,
-      [user, domain]
-    )
+    // let [result] = await conn.query(
+    //   `
+    // SELECT
+    //   ativo_dendron,
+    //   ativo_zendesk
+    // FROM
+    //   usuario u,
+    //   dominio d
+    // WHERE
+    //   u.fk_id_dominio = d.id and
+    //   u.user_basix = ? and
+    //   d.dominio = ? and
+    //   u.ativo = 1
+    // `,
+    //   [user, domain]
+    // )
 
-    console.log(result)
+    // console.log(result)
 
     let [[{ ativo_dendron, ativo_zendesk }]] = await conn.query(
       `
@@ -121,6 +121,8 @@ const middleware = async (req, res, next) => {
         await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360002789773)
         return res.json({ ok: "200" })
       }
+
+      console.log(history)
 
       if (
         history.indexOf("Cruzeiro_Esporte_Tour") > -1 ||
