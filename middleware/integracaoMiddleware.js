@@ -1,17 +1,36 @@
-const { getDendronParams, getZendeskParams } = require("../model/usuario");
-const { getClienteId, addTicket, addTicketWClient } = require("../service/api-dendron");
-const { addGravacaoEmEspera } = require("../model/integracao");
-const { addZenTicket, addZenTicketCanal } = require("../service/api-zendesk");
+const { getDendronParams, getZendeskParams } = require("../model/usuario")
+const { getClienteId, addTicket, addTicketWClient } = require("../service/api-dendron")
+const { addGravacaoEmEspera } = require("../model/integracao")
+const { addZenTicket, addZenTicketCanal } = require("../service/api-zendesk")
 
 const middleware = async (req, res, next) => {
   try {
-    let { from, to, user, domain, callid, event, history } = req.params;
+    let { from, to, user, domain, callid, event, history } = req.params
 
     if (!(event === "RINGING" || event === "ESTABLISHED")) {
-      return next();
+      return next()
     }
 
-    let { conn } = req;
+    let { conn } = req
+
+    let result = await conn.query(
+      `
+    SELECT
+      ativo_dendron,
+      ativo_zendesk
+    FROM
+      usuario u,
+      dominio d
+    WHERE
+      u.fk_id_dominio = d.id and
+      u.user_basix = ? and
+      d.dominio = ? and
+      u.ativo = 1
+    `,
+      [user, domain]
+    )
+
+    console.log(result)
 
     let [[{ ativo_dendron, ativo_zendesk }]] = await conn.query(
       `
@@ -28,18 +47,18 @@ const middleware = async (req, res, next) => {
       u.ativo = 1
     `,
       [user, domain]
-    );
+    )
 
-    console.log(ativo_dendron, ativo_zendesk);
+    console.log(ativo_dendron, ativo_zendesk)
 
     if (!ativo_dendron && !ativo_zendesk) {
-      return next();
+      return next()
     }
 
     if (ativo_dendron) {
-      let { idUser, idDominio, token, operador } = await getDendronParams(user, domain, conn);
+      let { idUser, idDominio, token, operador } = await getDendronParams(user, domain, conn)
       if (token) {
-        let clienteId = await getClienteId(token, from);
+        let clienteId = await getClienteId(token, from)
 
         if (clienteId) {
           if (history) {
@@ -50,11 +69,11 @@ const middleware = async (req, res, next) => {
               history.split(".").join(" -> "),
               clienteId,
               from
-            );
-            addGravacaoEmEspera(idUser, idDominio, id_ticket, callid, conn);
+            )
+            addGravacaoEmEspera(idUser, idDominio, id_ticket, callid, conn)
           } else {
-            let { id_ticket } = await addTicket(token, operador, "Telefonia", "", clienteId, from);
-            addGravacaoEmEspera(idUser, idDominio, id_ticket, callid, conn);
+            let { id_ticket } = await addTicket(token, operador, "Telefonia", "", clienteId, from)
+            addGravacaoEmEspera(idUser, idDominio, id_ticket, callid, conn)
           }
         } else {
           if (history) {
@@ -64,73 +83,78 @@ const middleware = async (req, res, next) => {
               history.split(".")[history.split(".").length - 1],
               history.split(".").join(" -> "),
               from
-            );
+            )
 
-            addGravacaoEmEspera(idUser, idDominio, id_ticket, callid, conn);
+            addGravacaoEmEspera(idUser, idDominio, id_ticket, callid, conn)
           } else {
-            let { id_ticket } = await addTicketWClient(token, operador, "Telefonia", "", from);
-            addGravacaoEmEspera(idUser, idDominio, id_ticket, callid, conn);
+            let { id_ticket } = await addTicketWClient(token, operador, "Telefonia", "", from)
+            addGravacaoEmEspera(idUser, idDominio, id_ticket, callid, conn)
           }
         }
       }
-      return res.send();
+      return res.send()
     }
 
     if (ativo_zendesk) {
-      let { email, token, sub_dominio } = await getZendeskParams(user, domain, conn);
+      let { email, token, sub_dominio } = await getZendeskParams(user, domain, conn)
 
-      if(from.indexOf('Invasao') === 0){
-        from = from.replace('Invasao', '')
-        await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360002790814);
-        return res.json({ ok: "200" });
+      if (from.indexOf("Invasao") === 0) {
+        from = from.replace("Invasao", "")
+        await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360002790814)
+        return res.json({ ok: "200" })
       }
 
-      if(from.indexOf('Cruzeiro') === 0){
-        from = from.replace('Cruzeiro', '')
-        await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360002789753);
-        return res.json({ ok: "200" });
+      if (from.indexOf("Cruzeiro") === 0) {
+        from = from.replace("Cruzeiro", "")
+        await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360002789753)
+        return res.json({ ok: "200" })
       }
 
-      if(from.indexOf('Colorado') === 0){
-        from = from.replace('Colorado', '')
-        await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360003537214);
-        return res.json({ ok: "200" });
+      if (from.indexOf("Colorado") === 0) {
+        from = from.replace("Colorado", "")
+        await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360003537214)
+        return res.json({ ok: "200" })
       }
 
-      if(from.indexOf('VouVerOFlu') === 0){
-        from = from.replace('VouVerOFlu', '')
-        await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360002789773);
-        return res.json({ ok: "200" });
+      if (from.indexOf("VouVerOFlu") === 0) {
+        from = from.replace("VouVerOFlu", "")
+        await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360002789773)
+        return res.json({ ok: "200" })
       }
 
-      if (history.indexOf("Cruzeiro_Esporte_Tour") > -1 || history.indexOf("Invasao_Corinthiana") > -1 || history.indexOf("Destino_Colorado") > -1 || history.indexOf("VouVerOFlu") > -1) {
+      if (
+        history.indexOf("Cruzeiro_Esporte_Tour") > -1 ||
+        history.indexOf("Invasao_Corinthiana") > -1 ||
+        history.indexOf("Destino_Colorado") > -1 ||
+        history.indexOf("VouVerOFlu") > -1
+      ) {
         if (history.indexOf("Cruzeiro_Esporte_Tour") > -1) {
-          await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360002789753);
+          await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360002789753)
         }
         if (history.indexOf("Invasao_Corinthiana") > -1) {
-          await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360002790814);
+          await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360002790814)
         }
         if (history.indexOf("Destino_Colorado") > -1) {
-          await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360003537214);
+          await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360003537214)
         }
         if (history.indexOf("VouVerOFlu") > -1) {
-          await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360002789773);
+          await addZenTicketCanal(sub_dominio, email, token, from, to, user, 360002789773)
         }
 
-        return res.json({ ok: "200" });
+        return res.json({ ok: "200" })
       }
 
-      await addZenTicket(sub_dominio, email, token, from, to, user);
+      await addZenTicket(sub_dominio, email, token, from, to, user)
 
-      return res.json({ ok: "200" });
+      return res.json({ ok: "200" })
     }
   } catch (error) {
-    console.log(new Date().toLocaleString());
-    console.log(req.params);
-    console.log(error);
+    console.log(new Date().toLocaleString())
+    console.log(req.params)
+    console.log(error)
 
-    return res.status(400).json({ error: "Requisição não concluida" });
+    return res.status(400).json({ error: "Requisição não concluida" })
   }
-};
+}
 
-module.exports = middleware;
+module.exports = middleware
