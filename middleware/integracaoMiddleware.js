@@ -13,7 +13,7 @@ const middleware = async (req, res, next) => {
 
     let { conn } = req
 
-    let result = await conn.query(
+    let [result] = await conn.query(
       `
     SELECT
       ativo_dendron,
