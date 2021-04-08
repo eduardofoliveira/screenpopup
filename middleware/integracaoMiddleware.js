@@ -122,10 +122,8 @@ const middleware = async (req, res, next) => {
         return res.json({ ok: "200" })
       }
 
-      console.log(history)
-
       if (
-        history.indexOf("Cruzeiro_Esporte_Tour") > -1 ||
+        (history !== undefined && history.indexOf("Cruzeiro_Esporte_Tour") > -1) ||
         history.indexOf("Invasao_Corinthiana") > -1 ||
         history.indexOf("Destino_Colorado") > -1 ||
         history.indexOf("VouVerOFlu") > -1
